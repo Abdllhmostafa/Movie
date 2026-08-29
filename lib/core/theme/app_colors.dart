@@ -3,30 +3,35 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // Primary Brand Colors
-  static const Color primary = Color(0xFF004182);
-  static const Color primaryDark = Color(0xFF002B56);
-  static const Color primaryLight = Color(0xFF0056B3);
+  // Primary Brand Colors (Cinema Gold & Accents)
+  static const Color primary = Color(0xFFFFBB3B);
+  static const Color primaryDark = Color(0xFFE5A823);
+  static const Color primaryLight = Color(0xFFFFD166);
+  static const Color gold = Color(0xFFFFBB3B);
 
-  // Background Colors
-  static const Color background = Color(0xFF004182);
+  // Background Colors (Cinematic Dark / Black Theme)
+  static const Color background = Color(0xFF121312);
+  static const Color scaffoldBackground = Color(0xFF121312);
+  static const Color cardBackground = Color(0xFF1E1E1E);
+  static const Color surface = Color(0xFF282A28);
   static const Color white = Colors.white;
-  static const Color scaffoldBackground = Color(0xFFF8F9FA);
 
   // Text Colors
   static const Color textWhite = Colors.white;
   static const Color textWhite70 = Color(0xB3FFFFFF);
-  static const Color textDark = Color(0xFF06004F);
-  static const Color textGrey = Color(0xFF808080);
-  static const Color hintColor = Color(0x80000000);
+  static const Color textGrey = Color(0xFFCBCBCB);
+  static const Color textDarkGrey = Color(0xFF707070);
+  static const Color textDark = Color(0xFF121312);
+  static const Color hintColor = Color(0xFF808080);
 
   // Form & Input Colors
-  static const Color inputFill = Colors.white;
-  static const Color inputBorder = Colors.white;
-  static const Color iconColor = Color(0xFF004182);
+  static const Color inputFill = Color(0xFF282A28);
+  static const Color inputBorder = Color(0xFF383B38);
+  static const Color iconColor = Color(0xFFFFBB3B);
+  static const Color iconUnselected = Color(0xFF707070);
 
   // Status & Feedback Colors
-  static const Color error = Color(0xFFD32F2F);
-  static const Color success = Color(0xFF2E7D32);
-  static const Color warning = Color(0xFFED6C02);
+  static const Color error = Color(0xFFE53935);
+  static const Color success = Color(0xFF43A047);
+  static const Color warning = Color(0xFFFFA000);
 }

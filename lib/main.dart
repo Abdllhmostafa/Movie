@@ -1,11 +1,12 @@
-import 'package:e_commerce_app/features/auth/data/data_source/data_source_imp.dart';
-import 'package:e_commerce_app/features/auth/data/repo/repo_imp.dart';
-import 'package:e_commerce_app/features/auth/domain/use_case/login_use_case.dart';
-import 'package:e_commerce_app/features/auth/domain/use_case/register_use_case.dart';
-import 'package:e_commerce_app/features/auth/presentation/manager/auth_cubit.dart';
-import 'package:e_commerce_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movie_app/core/theme/app_theme.dart';
+import 'package:movie_app/features/auth/data/data_source/data_source_imp.dart';
+import 'package:movie_app/features/auth/data/repo/repo_imp.dart';
+import 'package:movie_app/features/auth/domain/use_case/login_use_case.dart';
+import 'package:movie_app/features/auth/domain/use_case/register_use_case.dart';
+import 'package:movie_app/features/auth/presentation/manager/auth_cubit.dart';
+import 'package:movie_app/features/auth/presentation/screens/login_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,10 +24,11 @@ class MyApp extends StatelessWidget {
 
     return BlocProvider(
       create: (context) => AuthCubit(loginUseCase, registerUseCase),
-      child: const MaterialApp(
+      child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'E-Commerce App',
-        home: LoginScreen(),
+        title: 'Route Movie App',
+        theme: AppTheme.darkTheme,
+        home: const LoginScreen(),
       ),
     );
   }

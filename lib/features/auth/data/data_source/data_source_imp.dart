@@ -1,4 +1,4 @@
-import 'package:e_commerce_app/features/auth/data/data_source/data_source.dart';
+import 'package:movie_app/features/auth/data/data_source/data_source.dart';
 
 class AuthDataSourceImp implements AuthDataSource {
   @override

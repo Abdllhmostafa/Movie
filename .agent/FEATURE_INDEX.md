@@ -1,6 +1,6 @@
-# 📑 Features Index & Roadmap
+# 📑 Movie App Features Index & Roadmap
 
-This document serves as the central index of all modules/features in the **E-Commerce App**. It tracks the development status, layer components, use cases, state management, and dependencies for each feature.
+This document serves as the central index of all modules/features in the **Movie & Cinema App** (`movie_app`). It tracks the development status, layer components, use cases, state management, and dependencies for each feature.
 
 ---
 
@@ -8,14 +8,13 @@ This document serves as the central index of all modules/features in the **E-Com
 
 | Feature | Description | Status | Domain Layer | Data Layer | Presentation Layer |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| [🔐 Authentication (`auth`)](#-1-authentication-feature-auth) | Login, Register, Password Reset & Token Management | ✅ Completed | ✅ Ready | ✅ Ready | ✅ Ready |
-| [🛍️ Products & Catalog (`products`)](#-2-products--catalog-feature-products) | Browse products, product details, ratings, & stock | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Planned |
-| [🗂️ Categories (`categories`)](#-3-categories-feature-categories) | Category & sub-category exploration | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Planned |
-| [🛒 Shopping Cart (`cart`)](#-4-shopping-cart-feature-cart) | Add/remove items, update quantities, cart summary | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Planned |
-| [❤️ Wishlist / Favorites (`wishlist`)](#-5-wishlist--favorites-feature-wishlist) | Save favorite items for quick access | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Planned |
-| [💳 Checkout & Orders (`orders`)](#-6-checkout--orders-feature-orders) | Order placement, shipping address, payment, history | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Planned |
-| [👤 Profile & Settings (`profile`)](#-7-profile--account-feature-profile) | User profile, edit info, address book, preferences | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Planned |
-| [🔍 Search & Filtering (`search`)](#-8-search--filter-feature-search) | Keyword search, auto-suggestions, sort & filter | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Planned |
+| [🔐 Authentication (`auth`)](#-1-authentication-feature-auth) | User Login, Registration, Session & Profile | ✅ Completed | ✅ Ready | ✅ Ready | ✅ Ready |
+| [🎬 Home & Featured Movies (`home`)](#-2-home--featured-movies-home) | Trending, Popular, Top Rated, Now Playing sliders | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Planned |
+| [🗂️ Movie Genres & Browse (`genres`)](#-3-movie-genres--browse-genres) | Explore by Category (Action, Sci-Fi, Horror, Drama, etc.) | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Planned |
+| [🎞️ Movie Details & Trailer (`details`)](#-4-movie-details--trailer-details) | Overview, Cast, Trailer Player, Rating, Similar Movies | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Planned |
+| [🔍 Search & Filtering (`search`)](#-5-search--filtering-search) | Real-time title search, genre filters, release year | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Planned |
+| [🔖 Watchlist & Favorites (`watchlist`)](#-6-watchlist--favorites-watchlist) | Bookmark movies, offline watch later, mark as watched | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Planned |
+| [👤 User Profile & Settings (`profile`)](#-7-user-profile--settings-profile) | User avatar, watch history, language/theme settings | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Planned |
 
 *Legend: ✅ Completed | 🚧 In Progress | ⏳ Planned*
 
@@ -23,9 +22,9 @@ This document serves as the central index of all modules/features in the **E-Com
 
 ## 🔐 1. Authentication Feature (`auth`)
 
-- **Path:** [`lib/features/auth/`](file:///f:/ROUTE%202026/flutter%20project/e_commerce_app/lib/features/auth)
-- **Status:** ✅ Completed (Login & Register Flows with Modular Widgets)
-- **Purpose:** Handles user identity, registration, login, and session persistence.
+- **Path:** `lib/features/auth/`
+- **Status:** ✅ Completed (Dark Cinema Theme & Modular Widgets)
+- **Purpose:** Handles user sign in, registration, session persistence, and navigation.
 
 ### Layer Map:
 ```text
@@ -33,7 +32,7 @@ lib/features/auth/
 ├── data/
 │   ├── data_source/
 │   │   ├── data_source.dart            # AuthDataSource (Contract)
-│   │   └── data_source_imp.dart        # AuthDataSourceImp (API implementation)
+│   │   └── data_source_imp.dart        # AuthDataSourceImp (Implementation)
 │   ├── models/
 │   │   └── user_model.dart             # UserModel (JSON serialization)
 │   └── repo/
@@ -51,207 +50,163 @@ lib/features/auth/
     │   ├── auth_cubit.dart             # AuthCubit
     │   └── auth_state.dart             # AuthState (loginState, registerState)
     ├── screens/
-    │   ├── login_screen.dart           # LoginScreen (Composed of modular single-widget files)
-    │   └── register_screen.dart        # RegisterScreen (Composed of modular single-widget files)
+    │   ├── login_screen.dart           # LoginScreen (Dark Cinema theme)
+    │   └── register_screen.dart        # RegisterScreen (Dark Cinema theme)
     └── widgets/
-        ├── auth_button_widget.dart     # AuthButtonWidget (Action button with loading spinner)
-        ├── auth_header_widget.dart     # AuthHeaderWidget (Title & Subtitle header)
-        ├── auth_prompt_row.dart        # AuthPromptRow ("Don't have an account? Sign up")
-        ├── custom_text_field.dart      # CustomTextField (Styled input field with password toggle)
-        ├── forgot_password_widget.dart # ForgotPasswordWidget ("Forgot password" clickable link)
-        ├── login_form_widget.dart      # LoginFormWidget (Encapsulated login form & validation)
-        ├── register_form_widget.dart   # RegisterFormWidget (Encapsulated register form & validation)
-        └── route_logo_widget.dart      # RouteLogoWidget ("ROUTE" header branding)
+        ├── auth_button_widget.dart     # AuthButtonWidget (Cinema Gold button)
+        ├── auth_header_widget.dart     # AuthHeaderWidget (Title & subtitle header)
+        ├── auth_prompt_row.dart        # AuthPromptRow ("Don't have an account? Create Account")
+        ├── custom_text_field.dart      # CustomTextField (Dark card input with gold focus)
+        ├── forgot_password_widget.dart # ForgotPasswordWidget (Gold accent link)
+        ├── login_form_widget.dart      # LoginFormWidget (Encapsulated login form)
+        ├── register_form_widget.dart   # RegisterFormWidget (Encapsulated register form)
+        └── route_logo_widget.dart      # RouteLogoWidget / MovieLogoWidget (Movie branding)
 ```
-
-### Implemented Use Cases & Operations:
-- `LoginUseCase`: Authenticates user credentials via email/password.
-- `RegisterUseCase`: Registers a new user account with validation (name, email, password, rePassword, phone).
 
 ---
 
-## 🛍️ 2. Products & Catalog Feature (`products`)
+## 🎬 2. Home & Featured Movies (`home`)
 
-- **Path:** `lib/features/products/`
+- **Path:** `lib/features/home/`
 - **Status:** ⏳ Planned
-- **Purpose:** Displays product catalog, detailed product view, ratings, and stock status.
+- **Purpose:** Display featured movie carousel, Trending Today, Top Rated, and Upcoming releases.
 
 ### Layer Map:
 ```text
-lib/features/products/
+lib/features/home/
 ├── data/
-│   ├── data_source/                  # RemoteProductsDataSource (REST API)
-│   ├── models/                       # ProductModel (JSON parsing)
-│   └── repo/                         # ProductsRepoImp
+│   ├── data_source/                    # MoviesRemoteDataSource (TMDB API)
+│   ├── models/                         # MovieModel, MovieResponseModel
+│   └── repo/                           # MoviesRepoImp
 ├── domain/
-│   ├── entity/                       # ProductEntity
-│   ├── repo/                         # ProductsRepo (Contract)
+│   ├── entity/                         # MovieEntity
+│   ├── repo/                           # MoviesRepo (Contract)
 │   └── use_case/
-│       ├── get_products_use_case.dart
-│       ├── get_product_details_use_case.dart
-│       └── get_featured_products_use_case.dart
+│       ├── get_trending_movies_use_case.dart
+│       ├── get_popular_movies_use_case.dart
+│       ├── get_top_rated_movies_use_case.dart
+│       └── get_now_playing_movies_use_case.dart
 └── presentation/
-    ├── manager/                      # ProductsCubit, ProductsState
-    ├── screens/                      # HomeScreen, ProductDetailsScreen
-    └── widgets/                      # ProductCard, ProductRating, ProductImageGallery
+    ├── manager/                        # HomeCubit, HomeState
+    ├── screens/                        # HomeScreen, MainLayoutScreen
+    └── widgets/                        # MovieCarouselSlider, MovieSectionList, MoviePosterCard
 ```
 
 ---
 
-## 🗂️ 3. Categories Feature (`categories`)
+## 🗂️ 3. Movie Genres & Browse (`genres`)
 
-- **Path:** `lib/features/categories/`
+- **Path:** `lib/features/genres/`
 - **Status:** ⏳ Planned
-- **Purpose:** Categorize items and allow users to browse products by specific category or brand.
+- **Purpose:** Categorize and explore movies by genre (Action, Adventure, Sci-Fi, Drama, Horror, Comedy, etc.).
 
 ### Layer Map:
 ```text
-lib/features/categories/
+lib/features/genres/
 ├── data/
-│   ├── data_source/                  # CategoriesDataSource
-│   ├── models/                       # CategoryModel
-│   └── repo/                         # CategoriesRepoImp
+│   ├── data_source/                    # GenresDataSource
+│   ├── models/                         # GenreModel
+│   └── repo/                           # GenresRepoImp
 ├── domain/
-│   ├── entity/                       # CategoryEntity
-│   ├── repo/                         # CategoriesRepo
-│   └── use_case/                     # GetCategoriesUseCase, GetCategoryProductsUseCase
+│   ├── entity/                         # GenreEntity
+│   ├── repo/                           # GenresRepo
+│   └── use_case/                       # GetGenresUseCase, GetMoviesByGenreUseCase
 └── presentation/
-    ├── manager/                      # CategoriesCubit, CategoriesState
-    ├── screens/                      # CategoriesScreen, SubCategoriesScreen
-    └── widgets/                      # CategoryItemCard, CategoryChip
+    ├── manager/                        # GenresCubit, GenresState
+    ├── screens/                        # BrowseScreen, GenreMoviesScreen
+    └── widgets/                        # GenreCardWidget, GenreChipWidget
 ```
 
 ---
 
-## 🛒 4. Shopping Cart Feature (`cart`)
+## 🎞️ 4. Movie Details & Trailer (`details`)
 
-- **Path:** `lib/features/cart/`
+- **Path:** `lib/features/details/`
 - **Status:** ⏳ Planned
-- **Purpose:** Manage items added to the cart, quantity adjustments, discount codes, and price calculation.
+- **Purpose:** In-depth movie view: HD backdrop, cast & crew, video trailer player, synopsis, runtime, ratings, and similar movies.
 
 ### Layer Map:
 ```text
-lib/features/cart/
+lib/features/details/
 ├── data/
-│   ├── data_source/                  # CartRemoteDataSource & CartLocalDataSource
-│   ├── models/                       # CartModel, CartItemModel
-│   └── repo/                         # CartRepoImp
+│   ├── data_source/                    # MovieDetailsDataSource
+│   ├── models/                         # MovieDetailsModel, CastModel, TrailerModel
+│   └── repo/                           # MovieDetailsRepoImp
 ├── domain/
-│   ├── entity/                       # CartEntity, CartItemEntity
-│   ├── repo/                         # CartRepo
+│   ├── entity/                         # MovieDetailsEntity, CastEntity, TrailerEntity
+│   ├── repo/                           # MovieDetailsRepo
 │   └── use_case/
-│       ├── get_cart_use_case.dart
-│       ├── add_to_cart_use_case.dart
-│       ├── update_quantity_use_case.dart
-│       └── remove_from_cart_use_case.dart
+│       ├── get_movie_details_use_case.dart
+│       ├── get_movie_cast_use_case.dart
+│       ├── get_movie_trailers_use_case.dart
+│       └── get_similar_movies_use_case.dart
 └── presentation/
-    ├── manager/                      # CartCubit, CartState
-    ├── screens/                      # CartScreen
-    └── widgets/                      # CartItemWidget, PriceSummaryWidget, CheckoutFloatingBar
+    ├── manager/                        # DetailsCubit, DetailsState
+    ├── screens/                        # MovieDetailsScreen
+    └── widgets/                        # BackdropHeaderWidget, TrailerPlayerWidget, CastListWidget, SimilarMoviesWidget
 ```
 
 ---
 
-## ❤️ 5. Wishlist / Favorites Feature (`wishlist`)
-
-- **Path:** `lib/features/wishlist/`
-- **Status:** ⏳ Planned
-- **Purpose:** Allow users to bookmark products to a personalized favorites list.
-
-### Layer Map:
-```text
-lib/features/wishlist/
-├── data/
-│   ├── data_source/                  # WishlistDataSource
-│   ├── models/                       # WishlistItemModel
-│   └── repo/                         # WishlistRepoImp
-├── domain/
-│   ├── entity/                       # WishlistItemEntity
-│   ├── repo/                         # WishlistRepo
-│   └── use_case/                     # GetWishlistUseCase, ToggleFavoriteUseCase
-└── presentation/
-    ├── manager/                      # WishlistCubit, WishlistState
-    ├── screens/                      # WishlistScreen
-    └── widgets/                      # WishlistItemCard, FavoriteButton
-```
-
----
-
-## 💳 6. Checkout & Orders Feature (`orders`)
-
-- **Path:** `lib/features/orders/`
-- **Status:** ⏳ Planned
-- **Purpose:** Manage the checkout process, shipping addresses, payment gateway integration, and order tracking history.
-
-### Layer Map:
-```text
-lib/features/orders/
-├── data/
-│   ├── data_source/                  # OrdersDataSource, PaymentDataSource
-│   ├── models/                       # OrderModel, OrderItemModel
-│   └── repo/                         # OrdersRepoImp
-├── domain/
-│   ├── entity/                       # OrderEntity, OrderItemEntity
-│   ├── repo/                         # OrdersRepo
-│   └── use_case/
-│       ├── create_order_use_case.dart
-│       ├── get_orders_history_use_case.dart
-│       └── get_order_details_use_case.dart
-└── presentation/
-    ├── manager/                      # CheckoutCubit, OrdersCubit
-    ├── screens/                      # CheckoutScreen, OrderSuccessScreen, OrdersHistoryScreen
-    └── widgets/                      # AddressCard, PaymentMethodTile, OrderStatusTracker
-```
-
----
-
-## 👤 7. Profile & Account Feature (`profile`)
-
-- **Path:** `lib/features/profile/`
-- **Status:** ⏳ Planned
-- **Purpose:** Display and manage user profile details, saved addresses, language/theme settings, and app info.
-
-### Layer Map:
-```text
-lib/features/profile/
-├── data/
-│   ├── data_source/                  # ProfileDataSource
-│   ├── models/                       # ProfileModel, AddressModel
-│   └── repo/                         # ProfileRepoImp
-├── domain/
-│   ├── entity/                       # ProfileEntity, AddressEntity
-│   ├── repo/                         # ProfileRepo
-│   └── use_case/                     # GetProfileUseCase, UpdateProfileUseCase, ManageAddressUseCase
-└── presentation/
-    ├── manager/                      # ProfileCubit, ProfileState
-    ├── screens/                      # ProfileScreen, EditProfileScreen, AddressBookScreen
-    └── widgets/                      # ProfileHeader, SettingsTile, AddressCard
-```
-
----
-
-## 🔍 8. Search & Filter Feature (`search`)
+## 🔍 5. Search & Filtering (`search`)
 
 - **Path:** `lib/features/search/`
 - **Status:** ⏳ Planned
-- **Purpose:** Provide text search, search history, auto-completion, and multi-criteria filters (price, brand, category, rating).
+- **Purpose:** Fast keyword search with debounce, search history, year filter, rating filter, and genre filter.
 
 ### Layer Map:
 ```text
 lib/features/search/
 ├── data/
-│   ├── data_source/                  # SearchDataSource
-│   ├── models/                       # SearchResultModel
-│   └── repo/                         # SearchRepoImp
+│   ├── data_source/                    # SearchDataSource
+│   ├── models/                         # SearchResultModel
+│   └── repo/                           # SearchRepoImp
 ├── domain/
-│   ├── entity/                       # SearchFilterEntity
-│   ├── repo/                         # SearchRepo
-│   └── use_case/                     # SearchProductsUseCase, GetRecentSearchesUseCase
+│   ├── entity/                         # SearchMovieEntity
+│   ├── repo/                           # SearchRepo
+│   └── use_case/                       # SearchMoviesUseCase, GetSearchHistoryUseCase
 └── presentation/
-    ├── manager/                      # SearchCubit, SearchState
-    ├── screens/                      # SearchScreen, FilterBottomSheet
-    └── widgets/                      # SearchBarWidget, RecentSearchChip, FilterOptionTile
+    ├── manager/                        # SearchCubit, SearchState
+    ├── screens/                        # SearchScreen
+    └── widgets/                        # SearchBarWidget, MovieSearchResultTile, RecentSearchItem
 ```
+
+---
+
+## 🔖 6. Watchlist & Favorites (`watchlist`)
+
+- **Path:** `lib/features/watchlist/`
+- **Status:** ⏳ Planned
+- **Purpose:** Save movies to a personal watchlist, manage favorites, offline storage using Hive / SharedPreferences.
+
+### Layer Map:
+```text
+lib/features/watchlist/
+├── data/
+│   ├── data_source/                    # WatchlistLocalDataSource (Hive/DB)
+│   ├── models/                         # WatchlistModel
+│   └── repo/                           # WatchlistRepoImp
+├── domain/
+│   ├── entity/                         # WatchlistItemEntity
+│   ├── repo/                           # WatchlistRepo
+│   └── use_case/
+│       ├── get_watchlist_use_case.dart
+│       ├── add_to_watchlist_use_case.dart
+│       ├── remove_from_watchlist_use_case.dart
+│       └── check_is_favorite_use_case.dart
+└── presentation/
+    ├── manager/                        # WatchlistCubit, WatchlistState
+    ├── screens/                        # WatchlistScreen
+    └── widgets/                        # WatchlistTileWidget, BookmarkButtonWidget
+```
+
+---
+
+## 👤 7. User Profile & Settings (`profile`)
+
+- **Path:** `lib/features/profile/`
+- **Status:** ⏳ Planned
+- **Purpose:** User avatar, watch history stats, preferred genres, app language & dark theme preferences.
 
 ---
 
@@ -260,15 +215,12 @@ lib/features/search/
 ```mermaid
 graph TD
     Auth[🔐 Auth] --> Profile[👤 Profile]
-    Auth --> Cart[🛒 Cart]
-    Auth --> Orders[💳 Orders]
-    Auth --> Wishlist[❤️ Wishlist]
+    Auth --> Watchlist[🔖 Watchlist]
     
-    Categories[🗂️ Categories] --> Products[🛍️ Products]
-    Search[🔍 Search] --> Products
-    Products --> Cart
-    Products --> Wishlist
+    Home[🎬 Home Movies] --> Details[🎞️ Movie Details]
+    Genres[🗂️ Browse Genres] --> Details
+    Search[🔍 Search] --> Details
     
-    Cart --> Orders
-    Profile --> Orders
+    Details --> Watchlist
+    Details --> Trailer[🎥 Trailer Player]
 ```

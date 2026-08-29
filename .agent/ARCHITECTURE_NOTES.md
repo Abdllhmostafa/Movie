@@ -1,6 +1,6 @@
-# 🏛️ Architecture Notes & Design Decisions
+# 🎬 Movie App Architecture Notes & Design Decisions
 
-This document contains in-depth architectural notes, design decisions, principles, and guidelines adopted in this Flutter E-Commerce project.
+This document contains in-depth architectural notes, design decisions, principles, and guidelines adopted in the **Flutter Movie & Cinema Application** (`movie_app`).
 
 ---
 
@@ -9,10 +9,10 @@ This document contains in-depth architectural notes, design decisions, principle
 The architecture of this project is based on **Clean Architecture (Uncle Bob)** combined with a **Feature-First (Vertical Slice)** organization and the **BLoC / Cubit** state management pattern.
 
 ### Core Objectives
-1. **Testability:** Business logic and use cases can be unit-tested in isolation without starting a Flutter UI test or running an emulator.
-2. **Maintainability:** Code is modularized by feature. Changes to one feature (e.g. `auth`) do not break unrelated features (e.g. `cart`).
-3. **Framework Independence:** The core business rules (Domain layer) are written in pure Dart and do not depend on Flutter, UI frameworks, or third-party libraries (e.g. Dio, SharedPreferences).
-4. **Scalability:** New features can be developed in parallel by multiple developers following standard layer conventions.
+1. **Testability:** Movie business logic, trailer fetchers, search queries, and watchlist use cases can be unit-tested in isolation without launching a Flutter UI test or running an emulator.
+2. **Maintainability:** Code is modularized by movie feature. Changes to one feature (e.g. `movies_details` or `watchlist`) do not break unrelated features (e.g. `auth` or `search`).
+3. **Framework Independence:** The core business rules (Domain layer) are written in pure Dart and do not depend on Flutter, UI frameworks, or third-party libraries (e.g. Dio, TMDB SDK, SharedPreferences).
+4. **Scalability:** New movie features (e.g. Cast Filmography, Video Streaming, Offline Download) can be developed in parallel following standard layer conventions.
 
 ---
 
@@ -23,203 +23,187 @@ The fundamental rule of Clean Architecture is: **Dependencies can only point inw
 ```
     ┌─────────────────────────────────────────────────────────────┐
     │                    PRESENTATION LAYER                       │
-    │              (Flutter UI, Widgets, Cubits)                  │
+    │         (Flutter UI, Movie Cards, Sliders, Cubits)          │
     │                              │                              │
     │                              ▼ depends on                   │
     │               ┌─────────────────────────────┐               │
     │               │        DOMAIN LAYER         │               │
-    │               │  (Entities, Use Cases,      │               │
+    │               │  (Movie Entities, UseCases, │               │
     │               │   Repository Contracts)     │               │
     │               └─────────────────────────────┘               │
     │                              ▲ implemented by               │
     │                              │                              │
     │                      DATA LAYER                             │
-    │       (Data Sources, Models/DTOs, Repo Implementations)     │
+    │    (TMDB / REST API Sources, Movie DTOs, Repo Implementations)│
     └─────────────────────────────────────────────────────────────┘
 ```
 
-- **Domain Layer is completely independent:** It knows nothing about the Data layer or the Presentation layer.
-- **Data Layer depends on Domain Layer:** It implements the interfaces defined in Domain.
-- **Presentation Layer depends on Domain Layer:** It executes Use Cases provided by Domain.
+- **Domain Layer is completely independent:** Contains pure movie enterprise logic (e.g., `MovieEntity`, `MovieDetailsEntity`, `WatchlistEntity`).
+- **Data Layer depends on Domain Layer:** Implements repository interfaces, deserializes TMDB / backend JSON into Domain entities, and manages local caching (e.g., Hive / SharedPreferences).
+- **Presentation Layer depends on Domain Layer:** Executes Use Cases (e.g. `GetPopularMoviesUseCase`, `SearchMoviesUseCase`) through Cubits and renders cinematic UI widgets.
 
 ---
 
 ## 🔬 3. In-Depth Layer Breakdown & Notes
 
 ### 🟢 A. Domain Layer (`lib/features/<feature>/domain/`)
-The central layer containing pure enterprise and business rules.
+The central layer containing pure movie business entities, contracts, and interactors.
 
 #### 1. Entities (`domain/entity/`)
-- **What they are:** Plain Dart objects that represent core business concepts (e.g., `UserEntity`, `ProductEntity`).
+- **What they are:** Plain Dart objects representing core domain models (e.g., `MovieEntity`, `MovieDetailsEntity`, `CastEntity`, `GenreEntity`, `TrailerEntity`, `UserEntity`).
 - **Rules:**
-  - **No** `fromJson` / `toJson` methods inside Entities (leave serialization to Models).
-  - Use `final` immutable fields.
-  - Implement equality (`Equatable` or Dart 3 `sealed` / `record` patterns) for value-comparison.
+  - **No** `fromJson` / `toJson` methods inside Entities (leave serialization to Data Models).
+  - Use `final` immutable fields and const constructors.
+  - Value equality (e.g., `Equatable` or custom `operator ==`).
 
 #### 2. Repository Contracts (`domain/repo/`)
-- **What they are:** Abstract classes/interfaces that define *what* data operations can be performed, but **not** *how* they are fetched.
+- **What they are:** Abstract interfaces defining *what* movie data operations exist, without specifying *how* they are executed.
 - **Example:**
   ```dart
-  abstract class AuthRepo {
-    Future<Either<Failure, UserEntity>> login(String email, String password);
+  abstract class MoviesRepo {
+    Future<Either<Failure, List<MovieEntity>>> getTrendingMovies();
+    Future<Either<Failure, MovieDetailsEntity>> getMovieDetails(int movieId);
+    Future<Either<Failure, List<MovieEntity>>> searchMovies(String query);
   }
   ```
 
 #### 3. Use Cases / Interactors (`domain/use_case/`)
-- **What they are:** Classes encapsulating a **single, specific business action**.
+- **What they are:** Classes encapsulating a **single, specific movie action**.
 - **Rules:**
-  - Each use case should follow Single Responsibility.
-  - Use the `call()` method for a clean, callable syntax (`loginUseCase(email, password)`).
-  - Use cases call the repository interface and return results/entities to the Cubit.
+  - Each usecase has a single responsibility and uses the `call()` method.
+  - Examples: `GetTrendingMoviesUseCase`, `GetMovieDetailsUseCase`, `ToggleWatchlistUseCase`, `SearchMoviesUseCase`.
 
 ---
 
 ### 🔵 B. Data Layer (`lib/features/<feature>/data/`)
-Responsible for data retrieval, persistence, and external communication.
+Responsible for remote movie API calls (e.g., TMDB / Backend) and local cache persistence.
 
 #### 1. Models / DTOs (`data/models/`)
-- **What they are:** Data Transfer Objects extending or converting to Entities.
+- **What they are:** Data Transfer Objects extending or mapping to Domain Entities.
 - **Responsibilities:**
-  - JSON serialization (`fromJson` and `toJson`).
-  - Mapping server response structure to clean Domain Entities:
+  - Deserialization (`fromJson`) and Serialization (`toJson`).
+  - Mapping TMDB poster/backdrop paths to full image URLs.
     ```dart
-    class UserModel extends UserEntity {
-      UserModel({required super.id, required super.name, required super.email});
+    class MovieModel extends MovieEntity {
+      const MovieModel({
+        required super.id,
+        required super.title,
+        required super.overview,
+        required super.posterPath,
+        required super.backdropPath,
+        required super.voteAverage,
+        required super.releaseDate,
+      });
 
-      factory UserModel.fromJson(Map<String, dynamic> json) {
-        return UserModel(
-          id: json['id'] as String,
-          name: json['name'] as String,
-          email: json['email'] as String,
+      factory MovieModel.fromJson(Map<String, dynamic> json) {
+        return MovieModel(
+          id: json['id'] as int,
+          title: json['title'] as String? ?? '',
+          overview: json['overview'] as String? ?? '',
+          posterPath: json['poster_path'] != null 
+              ? 'https://image.tmdb.org/t/p/w500${json['poster_path']}' 
+              : null,
+          backdropPath: json['backdrop_path'] != null 
+              ? 'https://image.tmdb.org/t/p/original${json['backdrop_path']}' 
+              : null,
+          voteAverage: (json['vote_average'] as num?)?.toDouble() ?? 0.0,
+          releaseDate: json['release_date'] as String? ?? '',
         );
       }
-
-      Map<String, dynamic> toJson() => {'id': id, 'name': name, 'email': email};
     }
     ```
 
 #### 2. Data Sources (`data/data_source/`)
-- **Remote Data Source:** Directly interacts with network APIs (REST API, GraphQL) via HTTP clients (e.g., `Dio`).
-- **Local Data Source:** Directly interacts with local storage (e.g., `SharedPreferences`, `Hive`, `SQLite`, `FlutterSecureStorage`).
-- **Interface Segregation:** Always define an abstract class (e.g., `AuthDataSource`) and implement it in `AuthDataSourceImp`.
+- **Remote Data Source:** Directly interacts with Movie REST APIs (TMDB endpoints: `/trending/movie/day`, `/movie/{id}`, `/search/movie`).
+- **Local Data Source:** Caches watchlist, recent searches, and offline movie metadata.
 
 #### 3. Repository Implementations (`data/repo/`)
 - **Responsibilities:**
-  - Coordinates between Remote and Local Data Sources.
-  - Catches raw exceptions (e.g. `DioException`, `SocketException`) and maps them into domain `Failure` objects.
-  - Returns `Domain Entities` rather than raw `Data Models` to caller use cases.
+  - Coordinates between Remote & Local data sources.
+  - Catches exceptions and returns domain `Failure` / Result objects.
+  - Maps `MovieModel` lists into `MovieEntity` lists.
 
 ---
 
 ### 🟠 C. Presentation Layer (`lib/features/<feature>/presentation/`)
-Responsible for everything the user sees and interacts with.
+Responsible for cinematic UI rendering, animations, user interactions, and state management.
 
 #### 1. State Management with Cubit (`presentation/manager/`)
-- **Why Cubit over Bloc?** Cubits offer a more lightweight and straightforward API using methods rather than event classes, while preserving full unidirectional data flow and state emission.
 - **State Modeling:**
-  - States represent discrete UI states (Initial, Loading, Success, Error).
-  - Use `BaseState` inheritance or sealed classes for exhaustive `switch` pattern-matching in Dart 3:
+  - Immutable states representing UI phases (Initial, Loading, Success, Error).
+  - Sealed classes / `BaseState` wrapper for exhaustive handling:
     ```dart
-    sealed class AuthState {}
-    class AuthInitialState extends AuthState {}
-    class AuthLoadingState extends AuthState {}
-    class AuthSuccessState extends AuthState { final UserEntity user; AuthSuccessState(this.user); }
-    class AuthErrorState extends AuthState { final String message; AuthErrorState(this.message); }
+    sealed class MoviesState {}
+    class MoviesInitialState extends MoviesState {}
+    class MoviesLoadingState extends MoviesState {}
+    class MoviesSuccessState extends MoviesState {
+      final List<MovieEntity> movies;
+      const MoviesSuccessState(this.movies);
+    }
+    class MoviesErrorState extends MoviesState {
+      final String message;
+      const MoviesErrorState(this.message);
+    }
     ```
 
 #### 2. Separation of Widgets (`presentation/screens/` vs `presentation/widgets/`)
-- **Screens (Smart / Container Widgets):**
-  - High-level page widgets containing `Scaffold`, `BlocProvider`, `BlocConsumer`, or `BlocListener`.
-  - Listen for side-effects (snackbars, dialogs, navigation) and orchestrate screen layout.
-- **Widgets (Dumb / Presentational Widgets):**
-  - Small, modular sub-components.
-  - Receive data via parameters and trigger callbacks on user interaction.
-  - No direct business logic or repository calls.
+- **Screens (Container / Smart Widgets):**
+  - High-level views (`HomeScreen`, `MovieDetailsScreen`, `SearchScreen`, `WatchlistScreen`, `LoginScreen`).
+  - Manage `BlocConsumer` / `BlocProvider`, scaffold, and navigation transitions.
+- **Widgets (Presentational / Dumb Widgets):**
+  - Modular, reusable sub-components (`MovieCardWidget`, `MovieSliderWidget`, `RatingBadgeWidget`, `GenreChipWidget`, `CustomTextField`, `AuthButtonWidget`).
+  - Receive data via constructor parameters and dispatch user interactions via callbacks.
 
 ---
 
 ### 🟣 D. Core Layer (`lib/core/`)
-Cross-cutting shared components used across the entire application:
+Universal cross-cutting utilities used across the entire Movie App:
 
-- `core/services/`: Network clients (`DioFactory`), interceptors (logging, auth token injection), cache helpers.
-- `core/states/`: Base state representations (`BaseState`).
-- `core/theme/`: Colors (`AppColors`), text themes, dark/light mode configurations.
-- `core/widgets/`: Universal widgets (`CustomElevatedButton`, `AppTextInput`, `AppLoader`).
+- `core/services/`: API client (`DioFactory`, TMDB interceptors, API key handlers), local cache service.
+- `core/states/`: Generic state definitions (`BaseState`, `LoadingState`, `SuccessState`, `ErrorState`).
+- `core/theme/`: Dark Cinema palette (`AppColors`), typography, dark theme configuration (`AppTheme`).
+- `core/widgets/`: Universal components (`MoviePoster`, `ShimmerLoader`, `RatingStar`, `CustomButton`, `CustomTextField`).
 
 ---
 
-## ⚡ 4. Error Handling Strategy
+## 🎨 4. Dark Cinema Design Guidelines
 
-Never let raw exceptions bubble directly to the UI. Use structured functional error handling:
+- **Primary Color:** Cinema Gold (`#FFBB3B`) - Used for active ratings, CTA buttons, highlighted tabs, focus borders.
+- **Background Color:** Deep Obsidian (`#121312`) - Cinematic dark backdrop.
+- **Surface Color:** Slate / Charcoal (`#282A28`, `#1E1E1E`) - Movie cards, text fields, bottom navigation bar.
+- **Text Hierarchy:**
+  - Titles: White (`#FFFFFF`), Bold / ExtraBold, clear letter-spacing.
+  - Body & Subtitles: Slate Grey (`#CBCBCB`, `#707070`) for readability.
+- **Visual Elements:** High-resolution poster backdrops with vertical gradient scrims (`LinearGradient` from transparent to `#121312`).
+
+---
+
+## ⚡ 5. Error & Network Handling
 
 ```
-[ Data Source throws Exception ]
-               │
-               ▼
+[ Movie API throws DioException / SocketException ]
+                     │
+                     ▼
 [ Repository catches Exception and maps to Failure ]
-               │ (Returns Either<Failure, Data>)
-               ▼
-[ UseCase forwards Failure ]
-               │
-               ▼
-[ Cubit maps Failure to User-Friendly Message in State ]
-               │ (Emits ErrorState(errorMessage))
-               ▼
-[ UI displays Snackbar / Dialog / Error Widget ]
-```
-
-### Standard Failure Classes:
-- `ServerFailure`: HTTP 4xx / 5xx error responses from the backend.
-- `NetworkFailure`: No internet connection or socket timeout.
-- `CacheFailure`: Local storage retrieval or persistence errors.
-- `ValidationFailure`: Invalid input or form data.
-
----
-
-## 💉 5. Dependency Injection (DI) Guidelines
-
-To adhere to Dependency Inversion:
-- Use a Service Locator (e.g., `get_it`) to inject dependencies lazily.
-- Follow the dependency creation chain:
-  $$\text{Data Sources} \rightarrow \text{Repositories} \rightarrow \text{Use Cases} \rightarrow \text{Cubits}$$
-
-```dart
-// Example Service Locator Registration Pattern
-final getIt = GetIt.instance;
-
-void setupServiceLocator() {
-  // 1. Data Sources
-  getIt.registerLazySingleton<AuthDataSource>(() => AuthDataSourceImp(getIt<Dio>()));
-
-  // 2. Repositories
-  getIt.registerLazySingleton<AuthRepo>(() => AuthRepoImp(getIt<AuthDataSource>()));
-
-  // 3. Use Cases
-  getIt.registerLazySingleton<LoginUseCase>(() => LoginUseCase(getIt<AuthRepo>()));
-
-  // 4. Cubits (Factory -> new instance per screen)
-  getIt.registerFactory<AuthCubit>(() => AuthCubit(getIt<LoginUseCase>()));
-}
+                     │ (e.g. ServerFailure, NetworkFailure)
+                     ▼
+[ UseCase returns Failure / Result ]
+                     │
+                     ▼
+[ Cubit emits ErrorState(errorMessage) ]
+                     │
+                     ▼
+[ UI displays Error Banner / Retry Button ]
 ```
 
 ---
 
-## 🚫 6. Dos and Don'ts (Architecture Guardrails)
+## 🚫 6. Architecture Guardrails
 
 | ✅ DO | ❌ DON'T |
 | :--- | :--- |
-| **Keep Domain pure Dart** without importing `package:flutter/...`. | **Never** import UI or Flutter packages inside the Domain layer. |
-| **Emit immutable states** from Cubits. | **Never** mutate state properties directly without `emit()`. |
-| **Map Models to Entities** in the Data layer before returning to Domain. | **Never** pass raw JSON maps or Data Models directly to the UI. |
-| **Use `BlocListener`** for side effects (navigation, toast, snackbar). | **Never** perform navigation directly inside Cubit functions. |
-| **Inject dependencies** via constructor parameters. | **Never** instantiate repositories or data sources directly with `new` inside Cubits. |
-| **Keep Use Cases single-purpose** with one main `call()` method. | **Never** bundle multiple unrelated actions into one massive Use Case. |
-
----
-
-## 🧪 7. Testing Strategy
-
-1. **Domain Layer (Unit Tests):** Test Use Cases with mocked Repository interfaces (using `mocktail` or `mockito`).
-2. **Data Layer (Unit Tests):** Test Repository implementations and Data Source serialization against mock API responses.
-3. **Presentation Layer (Cubit Tests):** Test Cubit state transitions using `bloc_test` (asserting exact expected state sequences).
-4. **Widget Tests:** Test individual UI widgets and interaction behaviors in isolation.
+| **Keep Domain pure Dart** without importing `package:flutter/...`. | **Never** import UI packages or Flutter widgets inside `domain/`. |
+| **Emit immutable states** from Cubits. | **Never** mutate state lists/objects in-place without `emit()`. |
+| **Map API Models to Entities** in the Data layer before returning to Domain. | **Never** expose raw API JSON maps or TMDB response keys to UI widgets. |
+| **Use `BlocListener`** for side effects (toasts, navigation, snackbars). | **Never** trigger `Navigator.push` directly inside Cubit functions. |
+| **Keep Use Cases single-purpose** with `call()` method. | **Never** combine unrelated operations into one monolithic Use Case. |

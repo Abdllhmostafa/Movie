@@ -1,5 +1,5 @@
-import 'package:e_commerce_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_app/core/theme/app_colors.dart';
 
 class ForgotPasswordWidget extends StatelessWidget {
   final VoidCallback? onTap;
@@ -8,7 +8,7 @@ class ForgotPasswordWidget extends StatelessWidget {
   const ForgotPasswordWidget({
     super.key,
     this.onTap,
-    this.color = AppColors.textWhite,
+    this.color = AppColors.gold,
   });
 
   @override
@@ -21,10 +21,10 @@ class ForgotPasswordWidget extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
           child: Text(
-            'Forgot password',
+            'Forgot Password?',
             style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
               color: color,
             ),
           ),

@@ -1,6 +1,6 @@
-import 'package:e_commerce_app/core/theme/app_colors.dart';
-import 'package:e_commerce_app/features/auth/presentation/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_app/core/theme/app_colors.dart';
+import 'package:movie_app/features/auth/presentation/widgets/custom_text_field.dart';
 
 class RegisterFormWidget extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -31,12 +31,13 @@ class RegisterFormWidget extends StatelessWidget {
         children: [
           CustomTextField(
             label: 'Full Name',
-            hint: 'enter your full name',
+            hint: 'Enter your full name',
             controller: nameController,
             textInputAction: TextInputAction.next,
             prefixIcon: const Icon(
               Icons.person_outline,
-              color: AppColors.iconColor,
+              color: AppColors.gold,
+              size: 22,
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -51,13 +52,14 @@ class RegisterFormWidget extends StatelessWidget {
           const SizedBox(height: 16),
           CustomTextField(
             label: 'Mobile Number',
-            hint: 'enter your mobile no.',
+            hint: 'Enter your mobile number',
             controller: phoneController,
             keyboardType: TextInputType.phone,
             textInputAction: TextInputAction.next,
             prefixIcon: const Icon(
               Icons.phone_outlined,
-              color: AppColors.iconColor,
+              color: AppColors.gold,
+              size: 22,
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -71,14 +73,15 @@ class RegisterFormWidget extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           CustomTextField(
-            label: 'E-mail address',
-            hint: 'enter your email address',
+            label: 'Email',
+            hint: 'Enter your email address',
             controller: emailController,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
             prefixIcon: const Icon(
               Icons.email_outlined,
-              color: AppColors.iconColor,
+              color: AppColors.gold,
+              size: 22,
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -96,17 +99,18 @@ class RegisterFormWidget extends StatelessWidget {
           const SizedBox(height: 16),
           CustomTextField(
             label: 'Password',
-            hint: 'enter your password',
+            hint: 'Create a secure password',
             controller: passwordController,
             isPassword: true,
             textInputAction: TextInputAction.next,
             prefixIcon: const Icon(
               Icons.lock_outline,
-              color: AppColors.iconColor,
+              color: AppColors.gold,
+              size: 22,
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter your password';
+                return 'Please enter a password';
               }
               if (value.length < 6) {
                 return 'Password must be at least 6 characters';
@@ -116,19 +120,20 @@ class RegisterFormWidget extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           CustomTextField(
-            label: 'Re-Password',
-            hint: 're-enter your password',
+            label: 'Confirm Password',
+            hint: 'Re-enter your password',
             controller: rePasswordController,
             isPassword: true,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => onSubmitted?.call(),
             prefixIcon: const Icon(
               Icons.lock_outline,
-              color: AppColors.iconColor,
+              color: AppColors.gold,
+              size: 22,
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please re-enter your password';
+                return 'Please confirm your password';
               }
               if (value != passwordController.text) {
                 return 'Passwords do not match';

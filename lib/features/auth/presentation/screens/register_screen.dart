@@ -1,13 +1,13 @@
-import 'package:e_commerce_app/core/states/base_state.dart';
-import 'package:e_commerce_app/core/theme/app_colors.dart';
-import 'package:e_commerce_app/features/auth/presentation/manager/auth_cubit.dart';
-import 'package:e_commerce_app/features/auth/presentation/manager/auth_state.dart';
-import 'package:e_commerce_app/features/auth/presentation/widgets/auth_button_widget.dart';
-import 'package:e_commerce_app/features/auth/presentation/widgets/auth_prompt_row.dart';
-import 'package:e_commerce_app/features/auth/presentation/widgets/register_form_widget.dart';
-import 'package:e_commerce_app/features/auth/presentation/widgets/route_logo_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movie_app/core/states/base_state.dart';
+import 'package:movie_app/core/theme/app_colors.dart';
+import 'package:movie_app/features/auth/presentation/manager/auth_cubit.dart';
+import 'package:movie_app/features/auth/presentation/manager/auth_state.dart';
+import 'package:movie_app/features/auth/presentation/widgets/auth_button_widget.dart';
+import 'package:movie_app/features/auth/presentation/widgets/auth_prompt_row.dart';
+import 'package:movie_app/features/auth/presentation/widgets/register_form_widget.dart';
+import 'package:movie_app/features/auth/presentation/widgets/route_logo_widget.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -72,7 +72,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             if (state.registerState is SuccessState) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Registration Successful! Welcome!'),
+                  content: Text('Registration Successful! Welcome to Route Movies!'),
                   backgroundColor: AppColors.success,
                 ),
               );
@@ -101,7 +101,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const RouteLogoWidget(),
+                    const RouteLogoWidget(iconSize: 52, fontSize: 26),
                     const SizedBox(height: 24),
                     RegisterFormWidget(
                       formKey: _formKey,
@@ -114,7 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: 30),
                     AuthButtonWidget(
-                      text: 'Sign up',
+                      text: 'Create Account',
                       isLoading: isLoading,
                       onPressed: () => _onRegisterPressed(context),
                     ),

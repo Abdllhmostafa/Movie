@@ -1,5 +1,5 @@
-import 'package:e_commerce_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_app/core/theme/app_colors.dart';
 
 class CustomTextField extends StatefulWidget {
   final String label;
@@ -55,12 +55,12 @@ class _CustomTextFieldState extends State<CustomTextField> {
         Text(
           widget.label,
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 15,
             fontWeight: FontWeight.w500,
             color: widget.labelColor,
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         TextFormField(
           controller: widget.controller,
           validator: widget.validator,
@@ -69,11 +69,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
           onFieldSubmitted: widget.onFieldSubmitted,
           obscureText: _obscureText,
           enabled: widget.enabled,
-          cursorColor: AppColors.primary,
+          cursorColor: AppColors.gold,
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: AppColors.textDark,
+            color: AppColors.textWhite,
           ),
           decoration: InputDecoration(
             hintText: widget.hint,
@@ -88,8 +88,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
             suffixIcon: widget.isPassword
                 ? IconButton(
                     icon: Icon(
-                      _obscureText ? Icons.visibility_off : Icons.visibility,
-                      color: AppColors.iconColor,
+                      _obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                      color: AppColors.gold,
                       size: 22,
                     ),
                     onPressed: () {
@@ -105,17 +105,17 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: BorderSide.none,
+              borderSide: const BorderSide(color: AppColors.inputBorder, width: 1),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: BorderSide.none,
+              borderSide: const BorderSide(color: AppColors.inputBorder, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
               borderSide: const BorderSide(
-                color: AppColors.white,
-                width: 2,
+                color: AppColors.gold,
+                width: 1.5,
               ),
             ),
             errorBorder: OutlineInputBorder(
@@ -135,7 +135,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             errorStyle: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: AppColors.white,
+              color: AppColors.error,
             ),
           ),
         ),

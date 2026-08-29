@@ -1,4 +1,4 @@
-import 'package:e_commerce_app/features/auth/domain/repo/repo.dart';
+import 'package:movie_app/features/auth/domain/repo/repo.dart';
 
 class RegisterUseCase {
   final AuthRepo repo;

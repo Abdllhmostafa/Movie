@@ -1,15 +1,15 @@
-import 'package:e_commerce_app/core/states/base_state.dart';
-import 'package:e_commerce_app/core/theme/app_colors.dart';
-import 'package:e_commerce_app/features/auth/presentation/manager/auth_cubit.dart';
-import 'package:e_commerce_app/features/auth/presentation/manager/auth_state.dart';
-import 'package:e_commerce_app/features/auth/presentation/screens/register_screen.dart';
-import 'package:e_commerce_app/features/auth/presentation/widgets/auth_button_widget.dart';
-import 'package:e_commerce_app/features/auth/presentation/widgets/auth_header_widget.dart';
-import 'package:e_commerce_app/features/auth/presentation/widgets/auth_prompt_row.dart';
-import 'package:e_commerce_app/features/auth/presentation/widgets/login_form_widget.dart';
-import 'package:e_commerce_app/features/auth/presentation/widgets/route_logo_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movie_app/core/states/base_state.dart';
+import 'package:movie_app/core/theme/app_colors.dart';
+import 'package:movie_app/features/auth/presentation/manager/auth_cubit.dart';
+import 'package:movie_app/features/auth/presentation/manager/auth_state.dart';
+import 'package:movie_app/features/auth/presentation/screens/register_screen.dart';
+import 'package:movie_app/features/auth/presentation/widgets/auth_button_widget.dart';
+import 'package:movie_app/features/auth/presentation/widgets/auth_header_widget.dart';
+import 'package:movie_app/features/auth/presentation/widgets/auth_prompt_row.dart';
+import 'package:movie_app/features/auth/presentation/widgets/login_form_widget.dart';
+import 'package:movie_app/features/auth/presentation/widgets/route_logo_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -60,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
             if (state.loginState is SuccessState) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Login Successful! Welcome Back!'),
+                  content: Text('Login Successful! Welcome to Route Movies!'),
                   backgroundColor: AppColors.success,
                 ),
               );
@@ -91,12 +91,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       const SizedBox(height: 10),
                       const RouteLogoWidget(),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 36),
                       const AuthHeaderWidget(
-                        title: 'Welcome Back To Route',
-                        subtitle: 'Please sign in with your mail',
+                        title: 'Welcome Back',
+                        subtitle: 'Sign in to stream movies, trailers & shows',
                       ),
-                      const SizedBox(height: 35),
+                      const SizedBox(height: 28),
                       LoginFormWidget(
                         formKey: _formKey,
                         emailController: _emailController,
@@ -110,15 +110,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
                         },
                       ),
-                      const SizedBox(height: 35),
+                      const SizedBox(height: 30),
                       AuthButtonWidget(
-                        text: 'Login',
+                        text: 'Sign In',
                         isLoading: isLoading,
                         onPressed: () => _onLoginPressed(context),
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 28),
                       AuthPromptRow(
-                        questionText: "Don’t have an account?",
+                        questionText: "Don't have an account?",
                         actionText: "Create Account",
                         onTap: () => _navigateToRegister(context),
                       ),

@@ -1,8 +1,8 @@
-import 'package:e_commerce_app/core/states/base_state.dart';
-import 'package:e_commerce_app/features/auth/domain/use_case/login_use_case.dart';
-import 'package:e_commerce_app/features/auth/domain/use_case/register_use_case.dart';
-import 'package:e_commerce_app/features/auth/presentation/manager/auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movie_app/core/states/base_state.dart';
+import 'package:movie_app/features/auth/domain/use_case/login_use_case.dart';
+import 'package:movie_app/features/auth/domain/use_case/register_use_case.dart';
+import 'package:movie_app/features/auth/presentation/manager/auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final LoginUseCase loginUseCase;

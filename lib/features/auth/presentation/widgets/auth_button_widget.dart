@@ -1,5 +1,5 @@
-import 'package:e_commerce_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_app/core/theme/app_colors.dart';
 
 class AuthButtonWidget extends StatelessWidget {
   final String text;
@@ -16,11 +16,11 @@ class AuthButtonWidget extends StatelessWidget {
     required this.text,
     required this.onPressed,
     this.isLoading = false,
-    this.backgroundColor = AppColors.white,
-    this.textColor = AppColors.primary,
+    this.backgroundColor = AppColors.gold,
+    this.textColor = AppColors.textDark,
     this.height = 56,
     this.borderRadius = 15,
-    this.fontSize = 20,
+    this.fontSize = 18,
   });
 
   @override
@@ -32,12 +32,13 @@ class AuthButtonWidget extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
           foregroundColor: textColor,
-          disabledBackgroundColor: backgroundColor.withValues(alpha: 0.7),
-          disabledForegroundColor: textColor.withValues(alpha: 0.7),
+          disabledBackgroundColor: backgroundColor.withValues(alpha: 0.5),
+          disabledForegroundColor: textColor.withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
           ),
-          elevation: 0,
+          elevation: 3,
+          shadowColor: backgroundColor.withValues(alpha: 0.3),
         ),
         onPressed: isLoading ? null : onPressed,
         child: isLoading
@@ -53,8 +54,9 @@ class AuthButtonWidget extends StatelessWidget {
                 text,
                 style: TextStyle(
                   fontSize: fontSize,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.bold,
                   color: textColor,
+                  letterSpacing: 0.5,
                 ),
               ),
       ),

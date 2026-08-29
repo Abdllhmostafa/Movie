@@ -1,4 +1,4 @@
-import 'package:e_commerce_app/features/auth/domain/entity/user_entity.dart';
+import 'package:movie_app/features/auth/domain/entity/user_entity.dart';
 
 class UserModel extends UserEntity {
   const UserModel({

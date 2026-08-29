@@ -1,4 +1,4 @@
-import 'package:e_commerce_app/core/states/base_state.dart';
+import 'package:movie_app/core/states/base_state.dart';
 
 class AuthState {
   final BaseState<String> loginState;

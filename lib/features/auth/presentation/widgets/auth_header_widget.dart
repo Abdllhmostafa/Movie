@@ -1,5 +1,5 @@
-import 'package:e_commerce_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_app/core/theme/app_colors.dart';
 
 class AuthHeaderWidget extends StatelessWidget {
   final String title;
@@ -22,7 +22,7 @@ class AuthHeaderWidget extends StatelessWidget {
           title,
           style: const TextStyle(
             fontSize: 24,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.bold,
             color: AppColors.textWhite,
             height: 1.2,
           ),
@@ -31,9 +31,9 @@ class AuthHeaderWidget extends StatelessWidget {
         Text(
           subtitle,
           style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w300,
-            color: AppColors.textWhite70,
+            fontSize: 15,
+            fontWeight: FontWeight.w400,
+            color: AppColors.textGrey,
             height: 1.3,
           ),
         ),

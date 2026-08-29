@@ -1,7 +1,7 @@
-import 'package:e_commerce_app/core/theme/app_colors.dart';
-import 'package:e_commerce_app/features/auth/presentation/widgets/custom_text_field.dart';
-import 'package:e_commerce_app/features/auth/presentation/widgets/forgot_password_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_app/core/theme/app_colors.dart';
+import 'package:movie_app/features/auth/presentation/widgets/custom_text_field.dart';
+import 'package:movie_app/features/auth/presentation/widgets/forgot_password_widget.dart';
 
 class LoginFormWidget extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -27,14 +27,15 @@ class LoginFormWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           CustomTextField(
-            label: 'User Name / E-mail',
-            hint: 'enter your email',
+            label: 'Email',
+            hint: 'Enter your email address',
             controller: emailController,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
             prefixIcon: const Icon(
               Icons.email_outlined,
-              color: AppColors.iconColor,
+              color: AppColors.gold,
+              size: 22,
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -50,14 +51,15 @@ class LoginFormWidget extends StatelessWidget {
           const SizedBox(height: 20),
           CustomTextField(
             label: 'Password',
-            hint: 'enter your password',
+            hint: 'Enter your password',
             controller: passwordController,
             isPassword: true,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => onSubmitted?.call(),
             prefixIcon: const Icon(
               Icons.lock_outline,
-              color: AppColors.iconColor,
+              color: AppColors.gold,
+              size: 22,
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {

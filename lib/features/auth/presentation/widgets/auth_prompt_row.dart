@@ -1,11 +1,12 @@
-import 'package:e_commerce_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_app/core/theme/app_colors.dart';
 
 class AuthPromptRow extends StatelessWidget {
   final String questionText;
   final String actionText;
   final VoidCallback onTap;
-  final Color textColor;
+  final Color questionColor;
+  final Color actionColor;
   final double fontSize;
 
   const AuthPromptRow({
@@ -13,8 +14,9 @@ class AuthPromptRow extends StatelessWidget {
     required this.questionText,
     required this.actionText,
     required this.onTap,
-    this.textColor = AppColors.textWhite,
-    this.fontSize = 16,
+    this.questionColor = AppColors.textGrey,
+    this.actionColor = AppColors.gold,
+    this.fontSize = 15,
   });
 
   @override
@@ -27,7 +29,7 @@ class AuthPromptRow extends StatelessWidget {
           style: TextStyle(
             fontSize: fontSize,
             fontWeight: FontWeight.w400,
-            color: textColor,
+            color: questionColor,
           ),
         ),
         const SizedBox(width: 6),
@@ -40,10 +42,10 @@ class AuthPromptRow extends StatelessWidget {
               actionText,
               style: TextStyle(
                 fontSize: fontSize,
-                fontWeight: FontWeight.w600,
-                color: textColor,
+                fontWeight: FontWeight.bold,
+                color: actionColor,
                 decoration: TextDecoration.underline,
-                decorationColor: textColor,
+                decorationColor: actionColor,
               ),
             ),
           ),

@@ -1,16 +1,20 @@
-import 'package:e_commerce_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_app/core/theme/app_colors.dart';
 
 class RouteLogoWidget extends StatelessWidget {
+  final double iconSize;
   final double fontSize;
-  final Color color;
+  final Color primaryColor;
+  final Color secondaryColor;
   final bool showSubtitle;
 
   const RouteLogoWidget({
     super.key,
-    this.fontSize = 40,
-    this.color = AppColors.white,
-    this.showSubtitle = false,
+    this.iconSize = 64,
+    this.fontSize = 32,
+    this.primaryColor = AppColors.gold,
+    this.secondaryColor = AppColors.textWhite,
+    this.showSubtitle = true,
   });
 
   @override
@@ -18,27 +22,70 @@ class RouteLogoWidget extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          'ROUTE',
+        // Cinematic Icon / Clapperboard
+        Container(
+          width: iconSize + 16,
+          height: iconSize + 16,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.surface,
+            border: Border.all(
+              color: primaryColor.withValues(alpha: 0.3),
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: primaryColor.withValues(alpha: 0.15),
+                blurRadius: 20,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Center(
+            child: Icon(
+              Icons.movie_filter_rounded,
+              size: iconSize * 0.7,
+              color: primaryColor,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        // App Title
+        RichText(
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: fontSize,
-            fontWeight: FontWeight.w800,
-            color: color,
-            letterSpacing: 4,
-            height: 1.1,
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: 'ROUTE ',
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.w900,
+                  color: primaryColor,
+                  letterSpacing: 3,
+                ),
+              ),
+              TextSpan(
+                text: 'MOVIES',
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.w800,
+                  color: secondaryColor,
+                  letterSpacing: 2,
+                ),
+              ),
+            ],
           ),
         ),
         if (showSubtitle) ...[
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
-            'E-COMMERCE',
+            'WATCH UNLIMITED MOVIES & SHOWS',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: fontSize * 0.3,
+              fontSize: fontSize * 0.32,
               fontWeight: FontWeight.w400,
-              color: color.withValues(alpha: 0.8),
-              letterSpacing: 6,
+              color: AppColors.textGrey,
+              letterSpacing: 3,
             ),
           ),
         ],
@@ -46,3 +93,6 @@ class RouteLogoWidget extends StatelessWidget {
     );
   }
 }
+
+// Alias for semantic movie app naming
+typedef MovieLogoWidget = RouteLogoWidget;
