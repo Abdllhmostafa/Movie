@@ -10,15 +10,12 @@ import 'package:movie_app/features/auth/domain/use_case/login_use_case.dart';
 import 'package:movie_app/features/auth/domain/use_case/register_use_case.dart';
 import 'package:movie_app/features/auth/presentation/manager/auth_cubit.dart';
 
-
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -31,17 +28,16 @@ class MyApp extends StatelessWidget {
     return BlocProvider(
       create: (context) => AuthCubit(loginUseCase, registerUseCase),
       child: ScreenUtilInit(
-        designSize: Size(430,932),
+        designSize: Size(430, 932),
         minTextAdapt: true,
         splitScreenMode: true,
         builder: (context, child) {
           return MaterialApp(
             initialRoute: RouteName.splash,
-            onGenerateRoute:appRouters.generateRoute ,
+            onGenerateRoute: appRouters.generateRoute,
             debugShowCheckedModeBanner: false,
             title: 'Route Movie App',
             theme: AppTheme.darkTheme,
-
           );
         },
       ),

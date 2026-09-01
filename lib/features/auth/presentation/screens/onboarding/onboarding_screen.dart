@@ -39,11 +39,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       );
     }
   }
+
   void _onPageChanged(int index) {
     setState(() {
       _currentIndex = index;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,9 +80,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
               if (page.layout == OnboardingLayout.normal) ...[
-                OnboardingNormalContent(onNext: _nextPage,page:page,)
+                OnboardingNormalContent(onNext: _nextPage, page: page),
               ] else ...[
-                OnboardingBottomContent(page: page, onNext: _nextPage, onPrevious: _previousPage)
+                OnboardingBottomContent(
+                  page: page,
+                  onNext: _nextPage,
+                  onPrevious: _previousPage,
+                ),
               ],
             ],
           );
