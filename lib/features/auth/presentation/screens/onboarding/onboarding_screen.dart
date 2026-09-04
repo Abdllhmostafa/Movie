@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movie_app/core/routes/route_name.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
-import 'package:movie_app/features/auth/presentation/screens/onboarding/onBoarding_model.dart';
+import 'package:movie_app/features/auth/presentation/screens/onboarding/onboarding_model.dart';
 import 'package:movie_app/features/auth/presentation/widgets/onboarding_bottom_content.dart';
 import '../../widgets/onboarding_normal_content.dart';
 

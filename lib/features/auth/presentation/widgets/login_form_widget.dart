@@ -27,7 +27,6 @@ class LoginFormWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           CustomTextField(
-            label: 'Email',
             hint: 'Enter your email address',
             controller: emailController,
             keyboardType: TextInputType.emailAddress,
@@ -50,7 +49,6 @@ class LoginFormWidget extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           CustomTextField(
-            label: 'Password',
             hint: 'Enter your password',
             controller: passwordController,
             isPassword: true,
@@ -72,9 +70,7 @@ class LoginFormWidget extends StatelessWidget {
             },
           ),
           const SizedBox(height: 12),
-          ForgotPasswordWidget(
-            onTap: onForgotPassword,
-          ),
+          ForgotPasswordWidget(onTap: onForgotPassword),
         ],
       ),
     );

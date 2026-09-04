@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:movie_app/core/routes/route_name.dart';
 import 'package:movie_app/core/states/base_state.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 import 'package:movie_app/features/auth/presentation/manager/auth_cubit.dart';
@@ -47,6 +49,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  void _onGoogleSignIn(BuildContext context) {
+    Navigator.pushReplacementNamed(context, RouteName.layout);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -76,6 +82,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   backgroundColor: AppColors.success,
                 ),
               );
+              Navigator.pushReplacementNamed(context, RouteName.layout);
             } else if (state.registerState is ErrorState) {
               final error =
                   (state.registerState as ErrorState).message ??
@@ -94,15 +101,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
             return SafeArea(
               child: SingleChildScrollView(
                 physics: const ClampingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 20.w,
+                  vertical: 10.h,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const RouteLogoWidget(iconSize: 52, fontSize: 26),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24.h),
                     RegisterFormWidget(
                       formKey: _formKey,
                       nameController: _nameController,
@@ -112,19 +119,58 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       rePasswordController: _rePasswordController,
                       onSubmitted: () => _onRegisterPressed(context),
                     ),
-                    const SizedBox(height: 30),
+                    SizedBox(height: 28.h),
                     AuthButtonWidget(
                       text: 'Create Account',
                       isLoading: isLoading,
                       onPressed: () => _onRegisterPressed(context),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20.h),
                     AuthPromptRow(
                       questionText: 'Already have an account?',
                       actionText: 'Sign In',
                       onTap: () => Navigator.of(context).maybePop(),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 24.h),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            indent: 30.w,
+                            color: AppColors.gold,
+                            thickness: 1.5,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 14.w),
+                          child: Text(
+                            'OR',
+                            style: TextStyle(
+                              color: AppColors.gold,
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Divider(
+                            endIndent: 30.w,
+                            color: AppColors.gold,
+                            thickness: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 24.h),
+                    AuthButtonWidget(
+                      icon: Icons.g_mobiledata,
+                      iconSize: 34,
+                      text: 'Sign up with Google',
+                      isLoading: false,
+                      onPressed: () => _onGoogleSignIn(context),
+                    ),
+                    SizedBox(height: 20.h),
                   ],
                 ),
               ),
