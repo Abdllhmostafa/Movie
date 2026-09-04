@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movie_app/core/routes/route_name.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
-import 'package:movie_app/features/auth/presentation/screens/onboarding/onBoarding_model.dart';
+import 'package:movie_app/features/auth/presentation/screens/onboarding/onboarding_model.dart';
 import 'package:movie_app/features/auth/presentation/widgets/onboarding_bottom_content.dart';
 import '../../widgets/onboarding_normal_content.dart';
 
@@ -39,11 +39,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       );
     }
   }
+
   void _onPageChanged(int index) {
     setState(() {
       _currentIndex = index;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,9 +80,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
               if (page.layout == OnboardingLayout.normal) ...[
-                OnboardingNormalContent(onNext: _nextPage,page:page,)
+                OnboardingNormalContent(onNext: _nextPage, page: page),
               ] else ...[
-                OnboardingBottomContent(page: page, onNext: _nextPage, onPrevious: _previousPage)
+                OnboardingBottomContent(
+                  page: page,
+                  onNext: _nextPage,
+                  onPrevious: _previousPage,
+                ),
               ],
             ],
           );

@@ -10,6 +10,8 @@ class AuthButtonWidget extends StatelessWidget {
   final double height;
   final double borderRadius;
   final double fontSize;
+  final IconData? icon;
+  final double iconSize;
 
   const AuthButtonWidget({
     super.key,
@@ -21,6 +23,8 @@ class AuthButtonWidget extends StatelessWidget {
     this.height = 56,
     this.borderRadius = 15,
     this.fontSize = 18,
+    this.icon,
+    this.iconSize = 28,
   });
 
   @override
@@ -50,14 +54,24 @@ class AuthButtonWidget extends StatelessWidget {
                   valueColor: AlwaysStoppedAnimation<Color>(textColor),
                 ),
               )
-            : Text(
-                text,
-                style: TextStyle(
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                  letterSpacing: 0.5,
-                ),
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (icon != null) ...[
+                    Icon(icon, size: iconSize, color: textColor),
+                    const SizedBox(width: 10),
+                  ],
+                  Text(
+                    text,
+                    style: TextStyle(
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
               ),
       ),
     );

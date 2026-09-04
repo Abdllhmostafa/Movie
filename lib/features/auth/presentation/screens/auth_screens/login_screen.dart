@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:movie_app/core/routes/route_name.dart';
 import 'package:movie_app/core/states/base_state.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 import 'package:movie_app/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:movie_app/features/auth/presentation/manager/auth_state.dart';
-import 'package:movie_app/features/auth/presentation/screens/register_screen.dart';
 import 'package:movie_app/features/auth/presentation/widgets/auth_button_widget.dart';
-import 'package:movie_app/features/auth/presentation/widgets/auth_header_widget.dart';
 import 'package:movie_app/features/auth/presentation/widgets/auth_prompt_row.dart';
 import 'package:movie_app/features/auth/presentation/widgets/login_form_widget.dart';
 import 'package:movie_app/features/auth/presentation/widgets/route_logo_widget.dart';
@@ -41,9 +41,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _navigateToRegister(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const RegisterScreen()),
-    );
+    Navigator.of(context).pushNamed(RouteName.register);
+  }
+
+  void _onGoogleSignIn(BuildContext context) {
+    // Navigate to Layout directly on Google Sign In
+    Navigator.pushReplacementNamed(context, RouteName.layout);
   }
 
   @override
@@ -64,6 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   backgroundColor: AppColors.success,
                 ),
               );
+              Navigator.pushReplacementNamed(context, RouteName.layout);
             } else if (state.loginState is ErrorState) {
               final error =
                   (state.loginState as ErrorState).message ?? 'Login failed';
@@ -82,21 +86,16 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Center(
                 child: SingleChildScrollView(
                   physics: const ClampingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 24,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.w,
+                    vertical: 24.h,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10.h),
                       const RouteLogoWidget(),
-                      const SizedBox(height: 36),
-                      const AuthHeaderWidget(
-                        title: 'Welcome Back',
-                        subtitle: 'Sign in to stream movies, trailers & shows',
-                      ),
-                      const SizedBox(height: 28),
+                      SizedBox(height: 36.h),
                       LoginFormWidget(
                         formKey: _formKey,
                         emailController: _emailController,
@@ -110,19 +109,57 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
                         },
                       ),
-                      const SizedBox(height: 30),
+                      SizedBox(height: 30.h),
                       AuthButtonWidget(
                         text: 'Sign In',
                         isLoading: isLoading,
                         onPressed: () => _onLoginPressed(context),
                       ),
-                      const SizedBox(height: 28),
+                      SizedBox(height: 24.h),
                       AuthPromptRow(
                         questionText: "Don't have an account?",
                         actionText: "Create Account",
                         onTap: () => _navigateToRegister(context),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 28.h),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Divider(
+                              indent: 30.w,
+                              color: AppColors.gold,
+                              thickness: 1.5,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 14.w),
+                            child: Text(
+                              'OR',
+                              style: TextStyle(
+                                color: AppColors.gold,
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Divider(
+                              endIndent: 30.w,
+                              color: AppColors.gold,
+                              thickness: 1.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 28.h),
+                      AuthButtonWidget(
+                        icon: Icons.g_mobiledata,
+                        iconSize: 34,
+                        text: 'Login with Google',
+                        isLoading: false,
+                        onPressed: () => _onGoogleSignIn(context),
+                      ),
                     ],
                   ),
                 ),

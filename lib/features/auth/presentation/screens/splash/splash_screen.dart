@@ -1,7 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:movie_app/core/routes/app_routers.dart';
 import 'package:movie_app/core/routes/route_name.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -17,8 +16,11 @@ class SplashScreen extends StatelessWidget {
             Expanded(
               child: Center(
                 child: FadeInDown(
-                  onFinish:(_){
-                    Navigator.pushReplacementNamed(context,RouteName.onBoarding);
+                  onFinish: (_) {
+                    Navigator.pushReplacementNamed(
+                      context,
+                      RouteName.onBoarding,
+                    );
                   },
                   animate: true,
                   delay: Duration(seconds: 2),

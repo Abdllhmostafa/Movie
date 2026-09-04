@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
-import 'package:movie_app/features/auth/presentation/screens/onboarding/onBoarding_model.dart';
+import 'package:movie_app/features/auth/presentation/screens/onboarding/onboarding_model.dart';
 import 'onboarding_button.dart';
 
 class OnboardingNormalContent extends StatelessWidget {
