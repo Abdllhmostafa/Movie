@@ -27,12 +27,6 @@ This project is built following **Clean Architecture (Feature-First approach)** 
        └──────────────────────────────────────────────────┘
 ```
 
-### Key Principles
-- **Separation of Concerns:** Each layer has a distinct responsibility and is decoupled from outer dependencies.
-- **Dependency Inversion:** Domain is the central core. It does not depend on Data or Presentation. Data implements interfaces defined in Domain.
-- **Feature-First Organization:** Every feature (e.g., `auth`, `home`, `details`, `watchlist`) is modular and self-contained with its own Presentation, Domain, and Data layers.
-- **Shared Core:** Reusable components, dark theme palette, base states, network clients, and utilities live in `lib/core/`.
-
 ---
 
 ## 📂 Root Directory Structure
@@ -45,13 +39,18 @@ movie_app/
 ├── linux/                 # Linux desktop platform support
 ├── macos/                 # macOS desktop platform support
 ├── windows/               # Windows desktop platform support
+├── assets/                # App images, logos, movie posters
+│   ├── images/
+│   └── logos/
 ├── lib/                   # Main Dart/Flutter source code
 ├── test/                  # Unit, widget, and integration tests
 ├── pubspec.yaml           # App dependencies, assets, fonts, and metadata
 ├── analysis_options.yaml  # Linting and static analysis rules
 ├── README.md              # Project general readme
 └── .agent/                # AI Agent architecture and feature index guides
+    ├── AI_SUMMARY.md
     ├── ARCHITECTURE_NOTES.md
+    ├── DEVELOPMENT_RULES.md
     ├── FEATURE_INDEX.md
     └── FOLDER_GUIDE.md
 ```
@@ -63,6 +62,9 @@ movie_app/
 ```text
 lib/
 ├── core/                                # Shared global utilities
+│   ├── routes/                          # AppRouters & RouteName constants
+│   │   ├── app_routers.dart
+│   │   └── route_name.dart
 │   ├── services/                        # App-wide services (API clients, storage, network)
 │   ├── states/                          # Global base states (e.g., BaseState)
 │   │   └── base_state.dart
@@ -72,9 +74,9 @@ lib/
 │   └── widgets/                         # Reusable global UI widgets
 │
 ├── features/                            # Feature-first modules
-│   └── auth/                            # Authentication Feature Module
+│   └── auth/                            # Authentication, Onboarding & Layout
 │       ├── data/                        # Data Layer (Remote & Local data)
-│       │   ├── data_source/             # API calls and DB interactions
+│       │   ├── data_source/
 │       │   │   ├── data_source.dart     # Abstract data source contract
 │       │   │   └── data_source_imp.dart # Concrete implementation
 │       │   ├── models/                  # JSON/DTO models with serialization logic
@@ -96,8 +98,25 @@ lib/
 │           │   ├── auth_cubit.dart
 │           │   └── auth_state.dart
 │           ├── screens/                 # Full screen views
-│           │   ├── login_screen.dart
-│           │   └── register_screen.dart
+│           │   ├── splash/
+│           │   │   └── splash_screen.dart
+│           │   ├── onboarding/
+│           │   │   ├── onboarding_model.dart
+│           │   │   └── onboarding_screen.dart
+│           │   ├── auth_screens/
+│           │   │   ├── login_screen.dart
+│           │   │   └── register_screen.dart
+│           │   ├── layout/
+│           │   │   └── layout_screen.dart
+│           │   └── profile/
+│           │       ├── screens/
+│           │       │   ├── profile_screen.dart
+│           │       │   └── update_profile_screen.dart
+│           │       └── widgets/
+│           │           ├── avatar_picker_sheet.dart
+│           │           ├── custom_text_field.dart
+│           │           ├── movie_card.dart
+│           │           └── profile_button.dart
 │           └── widgets/                 # Feature-specific UI widgets
 │               ├── auth_button_widget.dart
 │               ├── auth_header_widget.dart
@@ -106,93 +125,25 @@ lib/
 │               ├── forgot_password_widget.dart
 │               ├── login_form_widget.dart
 │               ├── register_form_widget.dart
-│               └── route_logo_widget.dart
+│               ├── route_logo_widget.dart
+│               ├── onboarding_bottom_content.dart
+│               ├── onboarding_button.dart
+│               └── onboarding_normal_content.dart
 │
 └── main.dart                            # Application entry point
 ```
 
 ---
 
-## 🔄 Data & Control Flow (Example: Fetching Popular Movies)
+## 🚦 Navigation Routes Map
 
-```text
-[ User opens Home Screen ]
-         │
-         ▼
-[ Presentation - HomeScreen ]
-         │ Calls
-         ▼
-[ Presentation - HomeCubit ]
-         │ Emits LoadingState
-         │ Executes GetPopularMoviesUseCase
-         ▼
-[ Domain - GetPopularMoviesUseCase ]
-         │ Calls abstract MoviesRepo.getPopularMovies()
-         ▼
-[ Data - MoviesRepoImp ]
-         │ Calls MoviesRemoteDataSource
-         ▼
-[ Data - MoviesRemoteDataSourceImp ]
-         │ Sends GET request to TMDB API (/movie/popular)
-         ▼
-[ Backend / TMDB API ]
-         │ Returns JSON response
-         ▼
-[ Data - MovieModel.fromJson() ] (Deserializes JSON into MovieModel)
-         │
-         ▼
-[ Data - MoviesRepoImp ] (Returns List<MovieEntity>)
-         │
-         ▼
-[ Domain - GetPopularMoviesUseCase ]
-         │ Returns Result to HomeCubit
-         ▼
-[ Presentation - HomeCubit ]
-         │ Emits SuccessState(movies: List<MovieEntity>)
-         ▼
-[ Presentation - HomeScreen / MovieCarouselSlider ] (Rebuilds UI with movie posters)
-```
-
----
-
-## 🚀 How to Add a New Feature (e.g. `details`)
-
-### Step 1: Domain Layer
-1. **Entity**: Create `lib/features/details/domain/entity/movie_details_entity.dart`.
-2. **Repository Contract**: Create `lib/features/details/domain/repo/details_repo.dart`.
-3. **Use Cases**: Create `get_movie_details_use_case.dart`, `get_movie_trailers_use_case.dart`.
-
-### Step 2: Data Layer
-1. **Model**: Create `lib/features/details/data/models/movie_details_model.dart`.
-2. **Data Source**:
-   - `lib/features/details/data/data_source/details_data_source.dart` (Interface)
-   - `lib/features/details/data/data_source/details_data_source_imp.dart` (Implementation)
-3. **Repository Implementation**:
-   - `lib/features/details/data/repo/details_repo_imp.dart` (Implements `DetailsRepo`).
-
-### Step 3: Presentation Layer
-1. **Manager**:
-   - `details_state.dart` (Define Initial, Loading, Success, Error states).
-   - `details_cubit.dart` (Calls use case and emits states).
-2. **Screens & Widgets**:
-   - `lib/features/details/presentation/screens/movie_details_screen.dart`
-   - `lib/features/details/presentation/widgets/trailer_player_widget.dart`
-   - `lib/features/details/presentation/widgets/cast_list_widget.dart`
-
----
-
-## 🏷️ Naming Conventions
-
-| Item | Naming Pattern | Example |
+| Route Constant | Screen Widget | Description |
 | :--- | :--- | :--- |
-| **Files** | `snake_case.dart` | `get_movies_use_case.dart`, `movies_cubit.dart` |
-| **Classes** | `PascalCase` | `GetMoviesUseCase`, `MoviesCubit`, `MovieEntity` |
-| **Variables & Functions** | `camelCase` | `isFavorite`, `fetchTrending()`, `movieList` |
-| **Entities** | `<Name>Entity` | `MovieEntity`, `CastEntity`, `UserEntity` |
-| **Models** | `<Name>Model` | `MovieModel`, `CastModel`, `UserModel` |
-| **Repositories (Domain)** | `<Name>Repo` | `MoviesRepo`, `AuthRepo` |
-| **Repositories (Data)** | `<Name>RepoImp` | `MoviesRepoImp`, `AuthRepoImp` |
-| **Use Cases** | `<Action><Feature>UseCase` | `GetTrendingMoviesUseCase`, `LoginUseCase` |
-| **Cubits** | `<Feature>Cubit` | `MoviesCubit`, `AuthCubit` |
-| **States** | `<Feature>State` | `MoviesState`, `AuthState` |
-| **Screens** | `<Feature>Screen` | `HomeScreen`, `MovieDetailsScreen`, `LoginScreen` |
+| `RouteName.splash` (`/`) | `SplashScreen` | Animated branding intro |
+| `RouteName.onBoarding` (`onBoarding`) | `OnboardingScreen` | Interactive poster slider |
+| `RouteName.login` (`login`) | `LoginScreen` | Sign In, OR divider, Google Auth |
+| `RouteName.register` (`register`) | `RegisterScreen` | Create Account, Google Auth |
+| `RouteName.layout` (`layout`) | `LayoutScreen` | Floating Nav Bar (Home, Search, Browse, Profile) |
+| `RouteName.profile` (`profile`) | `ProfileScreen` | Profile, Watchlist & History tabs, Exit dialog |
+| `RouteName.updateProfileScreen` (`updateProfileScreen`) | `UpdateProfileScreen` | Avatar Picker Modal, Edit Name/Phone, Reset Password |
+

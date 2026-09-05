@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 
 class CustomTextField extends StatefulWidget {
-  final String label;
+  final String? label;
   final String hint;
   final TextEditingController controller;
   final String? Function(String?)? validator;
@@ -18,7 +18,7 @@ class CustomTextField extends StatefulWidget {
 
   const CustomTextField({
     super.key,
-    required this.label,
+    this.label,
     required this.hint,
     required this.controller,
     this.validator,
@@ -52,14 +52,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          widget.label,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-            color: widget.labelColor,
-          ),
-        ),
         const SizedBox(height: 8),
         TextFormField(
           controller: widget.controller,
@@ -88,7 +80,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
             suffixIcon: widget.isPassword
                 ? IconButton(
                     icon: Icon(
-                      _obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                      _obscureText
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
                       color: AppColors.gold,
                       size: 22,
                     ),
@@ -105,32 +99,29 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(color: AppColors.inputBorder, width: 1),
+              borderSide: const BorderSide(
+                color: AppColors.inputBorder,
+                width: 1,
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(color: AppColors.inputBorder, width: 1),
+              borderSide: const BorderSide(
+                color: AppColors.inputBorder,
+                width: 1,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(
-                color: AppColors.gold,
-                width: 1.5,
-              ),
+              borderSide: const BorderSide(color: AppColors.gold, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(
-                color: AppColors.error,
-                width: 1.5,
-              ),
+              borderSide: const BorderSide(color: AppColors.error, width: 1.5),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(
-                color: AppColors.error,
-                width: 2,
-              ),
+              borderSide: const BorderSide(color: AppColors.error, width: 2),
             ),
             errorStyle: const TextStyle(
               fontSize: 12,

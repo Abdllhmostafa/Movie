@@ -30,7 +30,6 @@ class RegisterFormWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           CustomTextField(
-            label: 'Full Name',
             hint: 'Enter your full name',
             controller: nameController,
             textInputAction: TextInputAction.next,
@@ -51,29 +50,6 @@ class RegisterFormWidget extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           CustomTextField(
-            label: 'Mobile Number',
-            hint: 'Enter your mobile number',
-            controller: phoneController,
-            keyboardType: TextInputType.phone,
-            textInputAction: TextInputAction.next,
-            prefixIcon: const Icon(
-              Icons.phone_outlined,
-              color: AppColors.gold,
-              size: 22,
-            ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Please enter your mobile number';
-              }
-              if (value.trim().length < 10) {
-                return 'Enter a valid mobile number (min 10 digits)';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
-          CustomTextField(
-            label: 'Email',
             hint: 'Enter your email address',
             controller: emailController,
             keyboardType: TextInputType.emailAddress,
@@ -98,8 +74,7 @@ class RegisterFormWidget extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           CustomTextField(
-            label: 'Password',
-            hint: 'Create a secure password',
+            hint: 'Create a password',
             controller: passwordController,
             isPassword: true,
             textInputAction: TextInputAction.next,
@@ -120,12 +95,10 @@ class RegisterFormWidget extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           CustomTextField(
-            label: 'Confirm Password',
-            hint: 'Re-enter your password',
+            hint: 'Confirm your password',
             controller: rePasswordController,
             isPassword: true,
-            textInputAction: TextInputAction.done,
-            onFieldSubmitted: (_) => onSubmitted?.call(),
+            textInputAction: TextInputAction.next,
             prefixIcon: const Icon(
               Icons.lock_outline,
               color: AppColors.gold,
@@ -137,6 +110,28 @@ class RegisterFormWidget extends StatelessWidget {
               }
               if (value != passwordController.text) {
                 return 'Passwords do not match';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+          CustomTextField(
+            hint: 'Enter your mobile number',
+            controller: phoneController,
+            keyboardType: TextInputType.phone,
+            textInputAction: TextInputAction.done,
+            onFieldSubmitted: (_) => onSubmitted?.call(),
+            prefixIcon: const Icon(
+              Icons.phone_outlined,
+              color: AppColors.gold,
+              size: 22,
+            ),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Please enter your mobile number';
+              }
+              if (value.trim().length < 10) {
+                return 'Enter a valid mobile number (min 10 digits)';
               }
               return null;
             },
