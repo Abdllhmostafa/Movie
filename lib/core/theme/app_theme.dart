@@ -6,6 +6,15 @@ class AppTheme {
 
   static ThemeData get darkTheme {
     return ThemeData(
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: AppColors.surface,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.white,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        type: BottomNavigationBarType.shifting,
+        elevation: 0,
+      ),
       brightness: Brightness.dark,
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.scaffoldBackground,

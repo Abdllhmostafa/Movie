@@ -34,6 +34,7 @@ dependencies:
   flutter_screenutil: ^5.9.3
   cupertino_icons: ^1.0.8
   flutter_bloc: ^8.1.6
+  carousel_slider: ^5.1.2
   flutter_svg: ^2.0.17
   lottie: ^3.3.1
   intl: ^0.20.3

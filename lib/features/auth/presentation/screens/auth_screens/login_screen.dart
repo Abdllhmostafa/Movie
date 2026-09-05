@@ -11,6 +11,8 @@ import 'package:movie_app/features/auth/presentation/widgets/auth_prompt_row.dar
 import 'package:movie_app/features/auth/presentation/widgets/login_form_widget.dart';
 import 'package:movie_app/features/auth/presentation/widgets/route_logo_widget.dart';
 
+import 'home_screen.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -31,13 +33,16 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _onLoginPressed(BuildContext context) {
-    FocusScope.of(context).unfocus();
-    if (_formKey.currentState?.validate() ?? false) {
-      context.read<AuthCubit>().login(
-            _emailController.text.trim(),
-            _passwordController.text,
-          );
-    }
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
+    // FocusScope.of(context).unfocus();
+    // if (_formKey.currentState?.validate() ?? false) {
+    //   context.read<AuthCubit>().login(
+    //         _emailController.text.trim(),
+    //         _passwordController.text,
+    //       );
+    // }
   }
 
   void _navigateToRegister(BuildContext context) {
