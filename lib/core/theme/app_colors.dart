@@ -15,6 +15,7 @@ class AppColors {
   static const Color cardBackground = Color(0xFF1E1E1E);
   static const Color surface = Color(0xFF282A28);
   static const Color white = Colors.white;
+  static const Color btnBgColor = Color(0xFFE82626);
 
   // Text Colors
   static const Color textWhite = Colors.white;
@@ -23,6 +24,7 @@ class AppColors {
   static const Color textDarkGrey = Color(0xFF707070);
   static const Color textDark = Color(0xFF121312);
   static const Color hintColor = Color(0xFF808080);
+  static const Color movieYearColor = Color(0xFFADADAD);
 
   // Form & Input Colors
   static const Color inputFill = Color(0xFF282A28);

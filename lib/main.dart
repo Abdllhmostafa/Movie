@@ -7,6 +7,8 @@ import 'package:movie_app/features/auth/domain/use_case/login_use_case.dart';
 import 'package:movie_app/features/auth/domain/use_case/register_use_case.dart';
 import 'package:movie_app/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:movie_app/features/auth/presentation/screens/login_screen.dart';
+import 'package:movie_app/features/auth/presentation/screens/movie_details.dart';
+import 'package:movie_app/features/auth/presentation/screens/search_tab.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,7 +30,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Route Movie App',
         theme: AppTheme.darkTheme,
-        home: const LoginScreen(),
+        home: const SearchTab(),
       ),
     );
   }
