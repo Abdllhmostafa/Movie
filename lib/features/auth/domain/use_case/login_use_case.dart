@@ -1,3 +1,5 @@
+import 'package:dartz/dartz.dart';
+import 'package:movie_app/features/auth/domain/entity/user_entity.dart';
 import 'package:movie_app/features/auth/domain/repo/repo.dart';
 
 class LoginUseCase {
@@ -5,7 +7,10 @@ class LoginUseCase {
 
   const LoginUseCase(this.repo);
 
-  Future<bool> call(String email, String password) {
-    return repo.login(email, password);
+  Future<Either<String, UserEntity>> call({
+    required String email,
+    required String password,
+  }) {
+    return repo.login(email: email, password: password);
   }
 }

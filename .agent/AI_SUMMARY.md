@@ -76,20 +76,19 @@ movie_app/
 │   │   └── widgets/                    # Global reusable UI widgets
 │   │
 │   ├── features/                       # Feature-first modular slices
-│   │   └── auth/                       # [✅ Completed] Splash, Onboarding, Login, Register, Layout, Profile
-│   │       ├── data/                   # Data sources, UserModel, RepoImp
-│   │       ├── domain/                 # UserEntity, AuthRepo, Login/Register UseCases
-│   │       └── presentation/
-│   │           ├── manager/            # AuthCubit & AuthState
-│   │           ├── screens/
-│   │           │   ├── splash/         # SplashScreen with animate_do
-│   │           │   ├── onboarding/     # OnboardingScreen (multi-page slider)
-│   │           │   ├── auth_screens/   # LoginScreen & RegisterScreen (with Google auth & OR divider)
-│   │           │   ├── layout/         # LayoutScreen (Floating nav bar: Home, Search, Browse, Profile)
-│   │           │   └── profile/        # ProfileScreen & UpdateProfileScreen
-│   │           │       ├── screens/    # ProfileScreen, UpdateProfileScreen
-│   │           │       └── widgets/    # AvatarPickerSheet, ProfileButton, MovieCard, CustomTextField
-│   │           └── widgets/            # Modular reusable auth and cinema widgets
+│   │   ├── splash/                     # SplashScreen with animate_do
+│   │   ├── onboarding/                 # OnboardingScreen (multi-page slider) & OnboardingModel
+│   │   ├── auth/                       # Authentication flow (Login, Register, Cubit, Entities)
+│   │   │   ├── data/                   # Data sources, UserModel, RepoImp
+│   │   │   ├── domain/                 # UserEntity, AuthRepo, Login/Register UseCases
+│   │   │   └── presentation/
+│   │   │       ├── manager/            # AuthCubit & AuthState
+│   │   │       ├── screens/            # LoginScreen & RegisterScreen
+│   │   │       └── widgets/            # AuthButton, LoginForm, BottomNavBar, etc.
+│   │   └── layout/                     # Main Cinema Layout & Navigation
+│   │       ├── presentation/
+│   │       │   └── layout_screens/     # LayoutScreen, HomeScreen, SearchTab, MovieDetails
+│   │       └── profile/                # ProfileScreen, UpdateProfileScreen, widgets
 │   │
 │   └── main.dart                       # Entry point, ScreenUtilInit, AppTheme.darkTheme, AuthCubit
 │

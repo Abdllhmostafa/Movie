@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:movie_app/core/routes/route_name.dart';
-import 'package:movie_app/core/states/base_state.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 import 'package:movie_app/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:movie_app/features/auth/presentation/manager/auth_state.dart';
@@ -10,8 +9,6 @@ import 'package:movie_app/features/auth/presentation/widgets/auth_button_widget.
 import 'package:movie_app/features/auth/presentation/widgets/auth_prompt_row.dart';
 import 'package:movie_app/features/auth/presentation/widgets/login_form_widget.dart';
 import 'package:movie_app/features/auth/presentation/widgets/route_logo_widget.dart';
-
-import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -33,16 +30,13 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _onLoginPressed(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-    );
-    // FocusScope.of(context).unfocus();
-    // if (_formKey.currentState?.validate() ?? false) {
-    //   context.read<AuthCubit>().login(
-    //         _emailController.text.trim(),
-    //         _passwordController.text,
-    //       );
-    // }
+    FocusScope.of(context).unfocus();
+    if (_formKey.currentState?.validate() ?? false) {
+      context.read<AuthCubit>().login(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+    }
   }
 
   void _navigateToRegister(BuildContext context) {
@@ -50,7 +44,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _onGoogleSignIn(BuildContext context) {
-    // Navigate to Layout directly on Google Sign In
     Navigator.pushReplacementNamed(context, RouteName.layout);
   }
 
@@ -62,30 +55,29 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Scaffold(
         backgroundColor: AppColors.background,
         body: BlocConsumer<AuthCubit, AuthState>(
-          listenWhen: (previous, current) =>
-              previous.loginState != current.loginState,
+          listenWhen: (previous, current) => previous != current,
           listener: (context, state) {
-            if (state.loginState is SuccessState) {
+            if (state is AuthSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Login Successful! Welcome to Route Movies!'),
+                SnackBar(
+                  content: Text(
+                    'Welcome back${state.user.name != null ? ", ${state.user.name}" : ""}!',
+                  ),
                   backgroundColor: AppColors.success,
                 ),
               );
               Navigator.pushReplacementNamed(context, RouteName.layout);
-            } else if (state.loginState is ErrorState) {
-              final error =
-                  (state.loginState as ErrorState).message ?? 'Login failed';
+            } else if (state is AuthFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(error),
+                  content: Text(state.errorMessage),
                   backgroundColor: AppColors.error,
                 ),
               );
             }
           },
           builder: (context, state) {
-            final isLoading = state.loginState is LoadingState;
+            final isLoading = state is AuthLoading;
 
             return SafeArea(
               child: Center(

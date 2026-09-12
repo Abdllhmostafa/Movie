@@ -7,4 +7,5 @@ class RouteName {
   static const layout = 'layout';
   static const profile = 'profile';
   static const updateProfileScreen = 'updateProfileScreen';
+  static const movieDatailsScreen = 'movieDatailsScreen';
 }

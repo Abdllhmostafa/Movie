@@ -1,21 +1,27 @@
-import 'package:movie_app/core/states/base_state.dart';
+import 'package:movie_app/features/auth/domain/entity/user_entity.dart';
 
-class AuthState {
-  final BaseState<String> loginState;
-  final BaseState<String> registerState;
+abstract class AuthState {
+  const AuthState();
+}
 
-  const AuthState({
-    this.loginState = const InitialState<String>(),
-    this.registerState = const InitialState<String>(),
-  });
+/// Initial State
+class AuthInitial extends AuthState {
+  const AuthInitial();
+}
 
-  AuthState copyWith({
-    BaseState<String>? loginState,
-    BaseState<String>? registerState,
-  }) {
-    return AuthState(
-      loginState: loginState ?? this.loginState,
-      registerState: registerState ?? this.registerState,
-    );
-  }
+/// Loading State
+class AuthLoading extends AuthState {
+  const AuthLoading();
+}
+
+/// Success State with UserEntity
+class AuthSuccess extends AuthState {
+  final UserEntity user;
+  const AuthSuccess(this.user);
+}
+
+/// Failure State with error message
+class AuthFailure extends AuthState {
+  final String errorMessage;
+  const AuthFailure(this.errorMessage);
 }

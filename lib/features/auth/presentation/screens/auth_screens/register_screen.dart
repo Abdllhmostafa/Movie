@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:movie_app/core/routes/route_name.dart';
-import 'package:movie_app/core/states/base_state.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 import 'package:movie_app/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:movie_app/features/auth/presentation/manager/auth_state.dart';
@@ -40,12 +39,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     FocusScope.of(context).unfocus();
     if (_formKey.currentState?.validate() ?? false) {
       context.read<AuthCubit>().register(
-            name: _nameController.text.trim(),
-            email: _emailController.text.trim(),
-            password: _passwordController.text,
-            rePassword: _rePasswordController.text,
-            phone: _phoneController.text.trim(),
-          );
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
     }
   }
 
@@ -64,47 +61,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios_new,
-              color: AppColors.white,
-            ),
+            icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.white),
             onPressed: () => Navigator.of(context).maybePop(),
           ),
         ),
         body: BlocConsumer<AuthCubit, AuthState>(
-          listenWhen: (previous, current) =>
-              previous.registerState != current.registerState,
+          listenWhen: (previous, current) => previous != current,
           listener: (context, state) {
-            if (state.registerState is SuccessState) {
+            if (state is AuthSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Registration Successful! Welcome to Route Movies!'),
+                SnackBar(
+                  content: Text(
+                    'Welcome to Route Movies, ${state.user.name ?? "Movie Lover"}!',
+                  ),
                   backgroundColor: AppColors.success,
                 ),
               );
               Navigator.pushReplacementNamed(context, RouteName.layout);
-            } else if (state.registerState is ErrorState) {
-              final error =
-                  (state.registerState as ErrorState).message ??
-                  'Registration failed';
+            } else if (state is AuthFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(error),
+                  content: Text(state.errorMessage),
                   backgroundColor: AppColors.error,
                 ),
               );
             }
           },
           builder: (context, state) {
-            final isLoading = state.registerState is LoadingState;
+            final isLoading = state is AuthLoading;
 
             return SafeArea(
               child: SingleChildScrollView(
                 physics: const ClampingScrollPhysics(),
-                padding: EdgeInsets.symmetric(
-                  horizontal: 20.w,
-                  vertical: 10.h,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
