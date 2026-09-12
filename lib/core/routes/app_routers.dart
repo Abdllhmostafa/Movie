@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:movie_app/core/routes/route_name.dart';
 import 'package:movie_app/features/auth/presentation/screens/auth_screens/login_screen.dart';
 import 'package:movie_app/features/auth/presentation/screens/auth_screens/register_screen.dart';
-import 'package:movie_app/features/auth/presentation/screens/layout/layout_screen.dart';
-import 'package:movie_app/features/auth/presentation/screens/onboarding/onboarding_screen.dart';
-import 'package:movie_app/features/auth/presentation/screens/profile/screens/profile_screen.dart';
-import 'package:movie_app/features/auth/presentation/screens/profile/screens/update_profile_screen.dart';
-import 'package:movie_app/features/auth/presentation/screens/splash/splash_screen.dart';
+import 'package:movie_app/features/layout/presentation/layout_screens/movie_details.dart';
+import 'package:movie_app/features/layout/presentation/profile/screens/profile_screen.dart';
+import 'package:movie_app/features/layout/presentation/profile/screens/update_profile_screen.dart';
+import 'package:movie_app/features/layout/presentation/layout_screens/layout_screen.dart';
+import 'package:movie_app/features/onboarding/onboarding_screen.dart';
+import 'package:movie_app/features/splash/splash_screen.dart';
 
 class AppRouters {
   Route<dynamic> generateRoute(RouteSettings settings) {
@@ -25,6 +26,8 @@ class AppRouters {
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
       case RouteName.updateProfileScreen:
         return MaterialPageRoute(builder: (_) => const UpdateProfileScreen());
+      case RouteName.movieDatailsScreen:
+        return MaterialPageRoute(builder: (_) => const MovieDetails());
 
       default:
         return MaterialPageRoute(

@@ -1,3 +1,5 @@
+import 'package:dartz/dartz.dart';
+import 'package:movie_app/features/auth/domain/entity/user_entity.dart';
 import 'package:movie_app/features/auth/domain/repo/repo.dart';
 
 class RegisterUseCase {
@@ -5,13 +7,11 @@ class RegisterUseCase {
 
   const RegisterUseCase(this.repo);
 
-  Future<bool> call(
-    String name,
-    String email,
-    String password,
-    String rePassword,
-    String phone,
-  ) {
-    return repo.register(name, email, password, rePassword, phone);
+  Future<Either<String, UserEntity>> call({
+    required String name,
+    required String email,
+    required String password,
+  }) {
+    return repo.register(name: name, email: email, password: password);
   }
 }

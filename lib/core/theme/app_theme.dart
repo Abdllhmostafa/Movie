@@ -12,7 +12,7 @@ class AppTheme {
         unselectedItemColor: AppColors.white,
         showSelectedLabels: false,
         showUnselectedLabels: false,
-        type: BottomNavigationBarType.shifting,
+        type: BottomNavigationBarType.fixed,
         elevation: 0,
       ),
       brightness: Brightness.dark,
