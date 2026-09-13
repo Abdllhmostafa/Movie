@@ -9,6 +9,7 @@ class MovieCubit extends Cubit<MovieState> {
   Future<void> fetchMovies() async {
     emit(MovieLoadingState());
     final result = await getAllMoviesUseCase();
+    if (isClosed) return;
     result.fold(
       (failure) => emit(MovieErrorState(failure.message)),
       (movies) => emit(MovieSuccessState(movies)),

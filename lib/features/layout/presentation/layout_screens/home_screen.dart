@@ -157,18 +157,11 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Private Sub-Widgets (Refactored for Modularity & Readability)
-// ---------------------------------------------------------------------------
-
 class _HomeBackdrop extends StatelessWidget {
   final double height;
   final String imageUrl;
 
-  const _HomeBackdrop({
-    required this.height,
-    required this.imageUrl,
-  });
+  const _HomeBackdrop({required this.height, required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -185,7 +178,11 @@ class _HomeBackdrop extends StatelessWidget {
                   errorBuilder: (context, error, stackTrace) => Container(
                     color: AppColors.background,
                     child: const Center(
-                      child: Icon(Icons.movie_creation_outlined, color: AppColors.cardBackground, size: 64),
+                      child: Icon(
+                        Icons.movie_creation_outlined,
+                        color: AppColors.cardBackground,
+                        size: 64,
+                      ),
                     ),
                   ),
                 ),
@@ -233,10 +230,7 @@ class _HomeCarousel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Image.asset(
-          'assets/images/img_availableNow.png',
-          width: width * .6,
-        ),
+        Image.asset('assets/images/img_availableNow.png', width: width * .6),
         SizedBox(height: height * 0.01),
         CarouselSlider(
           options: CarouselOptions(
@@ -253,10 +247,7 @@ class _HomeCarousel extends StatelessWidget {
             return _MoviePoster(movie: movie);
           }).toList(),
         ),
-        Image.asset(
-          'assets/images/img_watchNow.png',
-          width: width * .8,
-        ),
+        Image.asset('assets/images/img_watchNow.png', width: width * .8),
       ],
     );
   }
@@ -314,10 +305,7 @@ class _HomeHorizontalMovieList extends StatelessWidget {
         itemCount: movies.length,
         separatorBuilder: (context, index) => SizedBox(width: width * 0.03),
         itemBuilder: (context, index) {
-          return _MoviePoster(
-            movie: movies[index],
-            width: width * 0.35,
-          );
+          return _MoviePoster(movie: movies[index], width: width * 0.35);
         },
       ),
     );

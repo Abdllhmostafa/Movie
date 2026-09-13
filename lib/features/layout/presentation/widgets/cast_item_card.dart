@@ -33,14 +33,25 @@ class CastItemCard extends StatelessWidget {
             child: SizedBox(
               height: 60.h,
               width: 60.w,
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: AppColors.cardBackground,
-                  child: Icon(Icons.person, color: AppColors.textGrey, size: 28.sp),
-                ),
-              ),
+              child: imagePath.startsWith('http')
+                  ? Image.network(
+                      imagePath,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: AppColors.cardBackground,
+                        child: Icon(Icons.person,
+                            color: AppColors.textGrey, size: 28.sp),
+                      ),
+                    )
+                  : Image.asset(
+                      imagePath,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: AppColors.cardBackground,
+                        child: Icon(Icons.person,
+                            color: AppColors.textGrey, size: 28.sp),
+                      ),
+                    ),
             ),
           ),
           SizedBox(width: 12.w),

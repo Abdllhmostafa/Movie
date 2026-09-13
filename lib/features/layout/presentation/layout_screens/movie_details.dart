@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:movie_app/core/routes/route_name.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
+import 'package:movie_app/features/layout/data/data_source/movie_remote_data_source.dart';
+import 'package:movie_app/features/layout/data/repo/repo_imp.dart';
+import 'package:movie_app/features/layout/demain/entitiy/cast_entity.dart';
+import 'package:movie_app/features/layout/demain/entitiy/movie_entity.dart';
+import 'package:movie_app/features/layout/demain/use_case/get_movie_details_extra.dart';
+import 'package:movie_app/features/layout/demain/use_case/get_similar_movies.dart';
 import 'package:movie_app/features/layout/presentation/widgets/cast_item_card.dart';
 import 'package:movie_app/features/layout/presentation/widgets/genre_chip.dart';
 import 'package:movie_app/features/layout/presentation/widgets/movie_details_header.dart';
@@ -17,6 +24,65 @@ class MovieDetails extends StatefulWidget {
 
 class _MovieDetailsState extends State<MovieDetails> {
   bool _isFavorite = false;
+  List<MovieEntity> _similarMoviesList = [];
+  List<String> _screenshotsList = [];
+  List<CastEntity> _castList = [];
+  List<String> _genresList = [];
+  bool _isLoadingSimilar = true;
+  bool _isLoadingExtra = true;
+  bool _isInit = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isInit) {
+      _fetchMovieDetailsExtra();
+      _isInit = false;
+    }
+  }
+
+  Future<void> _fetchMovieDetailsExtra() async {
+    final movie = ModalRoute.of(context)?.settings.arguments as MovieEntity?;
+    if (movie == null || movie.id == 0) {
+      if (mounted) {
+        setState(() {
+          _isLoadingSimilar = false;
+          _isLoadingExtra = false;
+        });
+      }
+      return;
+    }
+
+    final remoteDataSource = MovieRemoteDataSourceImpl();
+    final repo = MovieRepoImp(remoteDataSource);
+    final getSimilarMoviesUseCase = GetSimilarMovies(repo);
+    final getMovieDetailsExtraUseCase = GetMovieDetailsExtra(repo);
+
+    final similarFuture = getSimilarMoviesUseCase(movie.id);
+    final extraFuture = getMovieDetailsExtraUseCase(movie.id);
+
+    final similarResult = await similarFuture;
+    final extraResult = await extraFuture;
+
+    if (!mounted) return;
+
+    setState(() {
+      similarResult.fold(
+        (_) {},
+        (movies) => _similarMoviesList = movies,
+      );
+      extraResult.fold(
+        (_) {},
+        (extra) {
+          _screenshotsList = extra.screenshots;
+          _castList = extra.cast;
+          _genresList = extra.genres;
+        },
+      );
+      _isLoadingSimilar = false;
+      _isLoadingExtra = false;
+    });
+  }
 
   static const List<String> _screenshots = [
     'assets/images/screenShot_img1.png',
@@ -64,6 +130,23 @@ class _MovieDetailsState extends State<MovieDetails> {
   @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
+    final movie =
+        (ModalRoute.of(context)?.settings.arguments as MovieEntity?) ??
+        MovieEntity(
+          id: 0,
+          title: 'Movie Details',
+          image: '',
+          rating: 7.7,
+          year: 2024,
+          runtime: 120,
+          summary:
+              'Following unexpected multiverse events, heroes unite to protect reality from imminent collapse while discovering hidden strengths within themselves.',
+          genres: const ['Action', 'Adventure', 'Fantasy', 'Sci-Fi'],
+        );
+
+    final displayImage = movie.backgroundImage.isNotEmpty
+        ? movie.backgroundImage
+        : movie.image;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -76,24 +159,48 @@ class _MovieDetailsState extends State<MovieDetails> {
                 height: height * 0.69,
                 child: Stack(
                   children: [
-                    Container(
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('assets/images/docStrange_img.png'),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 500,
+                      child: displayImage.isNotEmpty
+                          ? Image.network(
+                              displayImage,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
+                                    color: AppColors.background,
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.movie_creation_outlined,
+                                        color: AppColors.cardBackground,
+                                        size: 64,
+                                      ),
+                                    ),
+                                  ),
+                            )
+                          : Container(
+                              color: AppColors.cardBackground,
+                              child: const Center(
+                                child: Icon(
+                                  Icons.movie_creation_outlined,
+                                  color: AppColors.gold,
+                                  size: 64,
+                                ),
+                              ),
+                            ),
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            AppColors.background.withValues(alpha: 0.8),
-                            AppColors.background,
-                          ],
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              AppColors.background.withValues(alpha: 0.8),
+                              AppColors.background,
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -114,8 +221,8 @@ class _MovieDetailsState extends State<MovieDetails> {
                   children: [
                     // Header (Back, Favorite, Play, Title, Year, Watch Button)
                     MovieDetailsHeader(
-                      title: 'Doctor Strange in the Multiverse of Madness',
-                      year: '2022',
+                      title: movie.title,
+                      year: movie.year > 0 ? movie.year.toString() : '2024',
                       isFavorite: _isFavorite,
                       onBack: () => Navigator.of(context).pop(),
                       onFavorite: () {
@@ -130,18 +237,20 @@ class _MovieDetailsState extends State<MovieDetails> {
                     // Stats Row (Likes, Duration, Rating)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
+                      children: [
                         MovieStatBadge(
                           icon: Icons.favorite,
-                          label: '15',
+                          label: _isFavorite ? '16' : '15',
                         ),
                         MovieStatBadge(
                           icon: Icons.timer,
-                          label: '90',
+                          label: movie.runtime > 0 ? '${movie.runtime}' : '90',
                         ),
                         MovieStatBadge(
                           icon: Icons.star,
-                          label: '7.6',
+                          label: movie.rating > 0
+                              ? movie.rating.toStringAsFixed(1)
+                              : '7.7',
                         ),
                       ],
                     ),
@@ -149,9 +258,20 @@ class _MovieDetailsState extends State<MovieDetails> {
                     SizedBox(height: 24.h),
 
                     // Screenshots Section
-                    const MovieScreenshotsSection(
-                      screenshotPaths: _screenshots,
-                    ),
+                    if (_isLoadingExtra)
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 24),
+                          child:
+                              CircularProgressIndicator(color: AppColors.gold),
+                        ),
+                      )
+                    else
+                      MovieScreenshotsSection(
+                        screenshotPaths: _screenshotsList.isNotEmpty
+                            ? _screenshotsList
+                            : _screenshots,
+                      ),
 
                     SizedBox(height: 24.h),
 
@@ -165,24 +285,61 @@ class _MovieDetailsState extends State<MovieDetails> {
                       ),
                     ),
                     SizedBox(height: 12.h),
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 14.w,
-                        mainAxisSpacing: 14.h,
-                        childAspectRatio: 0.72,
+                    if (_isLoadingSimilar)
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 24),
+                          child:
+                              CircularProgressIndicator(color: AppColors.gold),
+                        ),
+                      )
+                    else if (_similarMoviesList.isNotEmpty)
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 14.w,
+                          mainAxisSpacing: 14.h,
+                          childAspectRatio: 0.72,
+                        ),
+                        itemCount: _similarMoviesList.length,
+                        itemBuilder: (context, index) {
+                          final similarMovie = _similarMoviesList[index];
+                          return MoviePosterCard(
+                            imagePath: similarMovie.image,
+                            rating: similarMovie.rating > 0
+                                ? similarMovie.rating.toStringAsFixed(1)
+                                : '7.7',
+                            onTap: () {
+                              Navigator.pushReplacementNamed(
+                                context,
+                                RouteName.movieDatailsScreen,
+                                arguments: similarMovie,
+                              );
+                            },
+                          );
+                        },
+                      )
+                    else
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 14.w,
+                          mainAxisSpacing: 14.h,
+                          childAspectRatio: 0.72,
+                        ),
+                        itemCount: _similarMovies.length,
+                        itemBuilder: (context, index) {
+                          final movie = _similarMovies[index];
+                          return MoviePosterCard(
+                            imagePath: movie['image']!,
+                            rating: movie['rating']!,
+                          );
+                        },
                       ),
-                      itemCount: _similarMovies.length,
-                      itemBuilder: (context, index) {
-                        final movie = _similarMovies[index];
-                        return MoviePosterCard(
-                          imagePath: movie['image']!,
-                          rating: movie['rating']!,
-                        );
-                      },
-                    ),
 
                     SizedBox(height: 24.h),
 
@@ -197,7 +354,9 @@ class _MovieDetailsState extends State<MovieDetails> {
                     ),
                     SizedBox(height: 8.h),
                     Text(
-                      'Following the events of Spider-Man No Way Home, Doctor Strange unwittingly casts a forbidden spell that accidentally opens up the multiverse. With help from Wong and Scarlet Witch, Strange confronts various versions of himself as well as teaming up with the young America Chavez while traveling through various realities and working to restore reality as he knows it. Along the way, Strange and his allies realize they must take on a powerful new adversary who seeks to take over the multiverse.—Blazer346',
+                      movie.summary.isNotEmpty
+                          ? movie.summary
+                          : 'No detailed summary is currently available for this title.',
                       style: TextStyle(
                         color: AppColors.textGrey,
                         fontSize: 15.sp,
@@ -217,21 +376,40 @@ class _MovieDetailsState extends State<MovieDetails> {
                       ),
                     ),
                     SizedBox(height: 12.h),
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _castMembers.length,
-                      separatorBuilder: (context, index) =>
-                          SizedBox(height: 10.h),
-                      itemBuilder: (context, index) {
-                        final cast = _castMembers[index];
-                        return CastItemCard(
-                          name: cast['name']!,
-                          character: cast['character']!,
-                          imagePath: cast['image']!,
-                        );
-                      },
-                    ),
+                    if (_isLoadingExtra)
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20),
+                          child:
+                              CircularProgressIndicator(color: AppColors.gold),
+                        ),
+                      )
+                    else
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: _castList.isNotEmpty
+                            ? _castList.length
+                            : _castMembers.length,
+                        separatorBuilder: (context, index) =>
+                            SizedBox(height: 10.h),
+                        itemBuilder: (context, index) {
+                          if (_castList.isNotEmpty) {
+                            final cast = _castList[index];
+                            return CastItemCard(
+                              name: cast.name,
+                              character: cast.character,
+                              imagePath: cast.image,
+                            );
+                          }
+                          final cast = _castMembers[index];
+                          return CastItemCard(
+                            name: cast['name']!,
+                            character: cast['character']!,
+                            imagePath: cast['image']!,
+                          );
+                        },
+                      ),
 
                     SizedBox(height: 24.h),
 
@@ -248,7 +426,11 @@ class _MovieDetailsState extends State<MovieDetails> {
                     Wrap(
                       spacing: 10.w,
                       runSpacing: 10.h,
-                      children: _genres
+                      children: (_genresList.isNotEmpty
+                              ? _genresList
+                              : (movie.genres.isNotEmpty
+                                  ? movie.genres
+                                  : _genres))
                           .map((genre) => GenreChip(label: genre))
                           .toList(),
                     ),
