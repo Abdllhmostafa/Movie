@@ -34,16 +34,29 @@ class MoviePosterCard extends StatelessWidget {
             SizedBox(
               width: width,
               height: height,
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  width: width,
-                  height: height,
-                  color: AppColors.cardBackground,
-                  child: Icon(Icons.movie, color: AppColors.textGrey, size: 32.sp),
-                ),
-              ),
+              child: imagePath.startsWith('http')
+                  ? Image.network(
+                      imagePath,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: width,
+                        height: height,
+                        color: AppColors.cardBackground,
+                        child: Icon(Icons.movie,
+                            color: AppColors.textGrey, size: 32.sp),
+                      ),
+                    )
+                  : Image.asset(
+                      imagePath,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: width,
+                        height: height,
+                        color: AppColors.cardBackground,
+                        child: Icon(Icons.movie,
+                            color: AppColors.textGrey, size: 32.sp),
+                      ),
+                    ),
             ),
             Positioned(
               top: 8.h,

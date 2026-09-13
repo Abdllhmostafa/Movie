@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>دليل مسار الـ API في تطبيق الأفلام - Clean Architecture</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    @page {
+      size: A4;
+      margin: 12mm 15mm 15mm 15mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Tajawal', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0d0f12;
+      color: #e2e8f0;
+      line-height: 1.7;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 25px 20px;
+      background: linear-gradient(135deg, #1e1b4b, #0f172a);
+      border: 1px solid #f59e0b;
+      border-radius: 16px;
+      margin-bottom: 25px;
+      box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.2);
+    }
+
+    .header h1 {
+      color: #fbbf24;
+      font-size: 26px;
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+
+    .header p {
+      color: #94a3b8;
+      font-size: 15px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 10px;
+      direction: ltr;
+    }
+
+    .section {
+      background: #151a23;
+      border: 1px solid #232c3d;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+      page-break-inside: avoid;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 19px;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 14px;
+      border-bottom: 2px solid #232c3d;
+      padding-bottom: 8px;
+    }
+
+    .step-number {
+      background: #f59e0b;
+      color: #000;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .flow-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .flow-node {
+      display: flex;
+      align-items: center;
+      background: #1c2331;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px 16px;
+      gap: 16px;
+    }
+
+    .flow-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      direction: ltr;
+      white-space: nowrap;
+    }
+
+    .tag-presentation { background: #3b82f6; color: #fff; }
+    .tag-domain { background: #8b5cf6; color: #fff; }
+    .tag-data { background: #10b981; color: #fff; }
+    .tag-network { background: #f59e0b; color: #000; }
+
+    .flow-desc {
+      font-size: 14px;
+      color: #cbd5e1;
+      flex: 1;
+    }
+
+    .arrow {
+      text-align: center;
+      color: #f59e0b;
+      font-size: 18px;
+      margin: -4px 0;
+    }
+
+    pre {
+      background: #090c10;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 12px;
+      overflow-x: auto;
+      direction: ltr;
+      text-align: left;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 12.5px;
+      color: #38bdf8;
+      margin: 10px 0;
+      line-height: 1.5;
+    }
+
+    .highlight {
+      color: #fbbf24;
+      font-weight: 700;
+    }
+
+    .note-box {
+      background: rgba(245, 158, 11, 0.08);
+      border-right: 4px solid #f59e0b;
+      padding: 12px 14px;
+      border-radius: 4px 8px 8px 4px;
+      margin: 12px 0;
+      font-size: 13.5px;
+      color: #fbbf24;
+    }
+
+    .error-box {
+      background: rgba(239, 68, 68, 0.1);
+      border-right: 4px solid #ef4444;
+      padding: 12px 14px;
+      border-radius: 4px 8px 8px 4px;
+      margin: 12px 0;
+      font-size: 13.5px;
+      color: #fca5a5;
+    }
+
+    .file-path {
+      font-family: 'JetBrains Mono', monospace;
+      color: #a78bfa;
+      direction: ltr;
+      display: inline-block;
+      font-size: 12px;
+      background: #1e1b4b;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 13px;
+    }
+
+    th, td {
+      border: 1px solid #334155;
+      padding: 8px 12px;
+      text-align: right;
+    }
+
+    th {
+      background: #1e293b;
+      color: #fbbf24;
+    }
+
+    td {
+      background: #111827;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <h1>🎬 مسار واستدعاء الـ API خطوة بخطوة في تطبيق الأفلام</h1>
+    <p>شرح كامل لتدفق البيانات بحسب معمارية الـ Clean Architecture من الواجهة إلى السيرفر والعودة</p>
+    <div class="badge">Clean Architecture • BLoC/Cubit • Dio • Entity Mapping</div>
+  </div>
+
+  <!-- Flowchart Overview -->
+  <div class="section">
+    <div class="section-title">
+      <span>📌 المخطط العام لدورة حياة الطلب (Request Lifecycle)</span>
+    </div>
+    <div class="flow-container">
+      <div class="flow-node">
+        <span class="flow-tag tag-presentation">1. UI Screen</span>
+        <div class="flow-desc"><b>HomeScreen:</b> عند بناء الصفحة يُستدعى <code>MovieCubit.fetchMovies()</code></div>
+      </div>
+      <div class="arrow">⬇️</div>
+      <div class="flow-node">
+        <span class="flow-tag tag-presentation">2. Cubit</span>
+        <div class="flow-desc"><b>MovieCubit:</b> يُرسل حالة <code>MovieLoadingState()</code> ويطلب البيانات من UseCase</div>
+      </div>
+      <div class="arrow">⬇️</div>
+      <div class="flow-node">
+        <span class="flow-tag tag-domain">3. Use Case</span>
+        <div class="flow-desc"><b>GetAllMovies:</b> ينفذ أمر جلب الأفلام من عقد الـ Repository</div>
+      </div>
+      <div class="arrow">⬇️</div>
+      <div class="flow-node">
+        <span class="flow-tag tag-data">4. Repository Imp</span>
+        <div class="flow-desc"><b>MovieRepoImp:</b> يُنسق بين الـ DataSource ويحوّل الـ Models إلى Entities ويُرجع <code>Either</code></div>
+      </div>
+      <div class="arrow">⬇️</div>
+      <div class="flow-node">
+        <span class="flow-tag tag-data">5. Remote DataSource</span>
+        <div class="flow-desc"><b>MovieRemoteDataSourceImpl:</b> ينفذ طلب الشبكة الفعلي عبر مكتبة <code>Dio</code></div>
+      </div>
+      <div class="arrow">⬇️</div>
+      <div class="flow-node">
+        <span class="flow-tag tag-network">6. YTS Movies Server</span>
+        <div class="flow-desc"><b>API Endpoint:</b> يرجع السيرفر JSON يحتوي على مصفوفة الأفلام <code>list_movies.json</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 1 & 2 -->
+  <div class="section">
+    <div class="section-title">
+      <span class="step-number">1</span>
+      <span>الطبقة الأولى: العرض وإطلاق الطلب (Presentation Layer)</span>
+    </div>
+    <p>يبدأ المسار عند فتح التطبيق ودخول شاشة الـ <b>HomeScreen</b>، حيث يتم تزويدها بـ <code>MovieCubit</code> واستدعاء جلب الأفلام فوراً:</p>
+    <span class="file-path">lib/features/layout/presentation/layout_screens/home_screen.dart</span>
+    <pre>BlocProvider(
+  create: (context) {
+    final remoteDataSource = MovieRemoteDataSourceImpl();
+    final repo = MovieRepoImp(remoteDataSource);
+    final getAllMoviesUseCase = GetAllMovies(repo);
+    return MovieCubit(getAllMoviesUseCase: getAllMoviesUseCase)..fetchMovies();
+  },
+  child: const HomeScreenContent(),
+);</pre>
+
+    <div class="section-title" style="margin-top: 20px;">
+      <span class="step-number">2</span>
+      <span>مدير الحالة: (MovieCubit)</span>
+    </div>
+    <p>يقوم الـ Cubit بتغيير الحالة فوراً إلى التحميل (Loading) حتى تظهر علامة الانتظار للمستخدم، ثم يستدعي الـ UseCase:</p>
+    <span class="file-path">lib/features/layout/presentation/maneger/movie_cubit.dart</span>
+    <pre>Future&lt;void&gt; fetchMovies() async {
+  emit(MovieLoadingState()); // 1. إظهار مؤشر التحميل
+  final result = await getAllMoviesUseCase.call(); // 2. طلب البيانات
+
+  result.fold(
+    (failure) => emit(MovieErrorState(failure.message)), // في حالة الخطأ
+    (movies) => emit(MovieSuccessState(movies)),         // في حالة النجاح
+  );
+}</pre>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- Step 3 & 4 -->
+  <div class="section">
+    <div class="section-title">
+      <span class="step-number">3</span>
+      <span>طبقة النطاق: حالة الاستخدام والعقد (Domain Layer)</span>
+    </div>
+    <p>هذه الطبقة نقية تماماً (Pure Dart) لا تعتمد على Flutter أو Dio أو أي مكتبة خارجية. وظيفتها تحديد منطق العمل والكيان المستهدف <code>MovieEntity</code>:</p>
+    <span class="file-path">lib/features/layout/demain/use_case/get_all_movies.dart</span>
+    <pre>class GetAllMovies {
+  final MovieRepo movieRepo;
+  GetAllMovies(this.movieRepo);
+
+  FutureResult&lt;List&lt;MovieEntity&gt;&gt; call() async {
+    return await movieRepo.getAllMovie();
+  }
+}</pre>
+  </div>
+
+  <!-- Step 5 & 6 -->
+  <div class="section">
+    <div class="section-title">
+      <span class="step-number">4</span>
+      <span>طبقة البيانات: الاتصال الفعلي بالإنترنت (Data Layer & Dio)</span>
+    </div>
+    <p>يقوم الـ <b>MovieRemoteDataSourceImpl</b> بإرسال طلب <code>HTTP GET</code> للرابط الخارجي عبر مكتبة <code>Dio</code>:</p>
+    <span class="file-path">lib/features/layout/data/data_source/movie_remote_data_source.dart</span>
+    <pre>final response = await DioSevice.dio.get(
+  'https://movies-api.accel.li/api/v2/list_movies.json',
+);
+
+if (response.statusCode == 200) {
+  final Map&lt;String, dynamic&gt; data = response.data is String
+      ? jsonDecode(response.data as String)
+      : response.data;
+  final movieModel = MovieModel.fromJson(data);
+  return movieModel.data?.movies ?? [];
+}</pre>
+  </div>
+
+  <!-- Step 7: Data to Entity Mapping -->
+  <div class="section">
+    <div class="section-title">
+      <span class="step-number">5</span>
+      <span>تحويل البيانات من Model إلى Entity (Data Mapping)</span>
+    </div>
+    <p>لكي تحافظ الشاشات على استقلاليتها، نقوم بتحويل كائنات الـ Model (القادمة من الـ JSON) إلى كائنات نظيفة <code>MovieEntity</code>:</p>
+    <span class="file-path">lib/features/layout/data/models/movie_model.dart</span>
+    <pre>extension MoviesExtension on Movies {
+  MovieEntity toEntity() {
+    return MovieEntity(
+      id: id ?? 0,
+      title: title ?? '',
+      image: mediumCoverImage ?? largeCoverImage ?? '',
+      rating: rating ?? 0.0,
+      year: year ?? 0,
+      runtime: runtime ?? 0,
+      summary: summary ?? descriptionFull ?? '',
+      genres: genres ?? const [],
+      backgroundImage: backgroundImageOriginal ?? backgroundImage ?? '',
+    );
+  }
+}</pre>
+    <p>ثم يقوم <b>MovieRepoImp</b> بلف القائمة في <code>Right(moviesEntities)</code> وإعادتها للـ Cubit.</p>
+  </div>
+
+  <!-- Step 8: Navigation to Details Screen -->
+  <div class="section">
+    <div class="section-title">
+      <span class="step-number">6</span>
+      <span>تمرير بيانات الفيلم لشاشة التفاصيل (MovieDetails)</span>
+    </div>
+    <p>عند نقر المستخدم على أي بوستر فيلم في الـ HomeScreen، يتم تمرير كائن الـ <code>movie</code> بالكامل كـ <code>arguments</code>:</p>
+    <span class="file-path">home_screen.dart ➡️ movie_details.dart</span>
+    <pre>// 1. الإرسال من شاشة الهوم:
+Navigator.pushNamed(
+  context,
+  RouteName.movieDatailsScreen,
+  arguments: movie, // كائن MovieEntity كامل
+);
+
+// 2. الاستقبال داخل شاشة التفاصيل:
+final movie = ModalRoute.of(context)?.settings.arguments as MovieEntity?;
+
+// 3. عرض البيانات في الودجات:
+MovieDetailsHeader(
+  title: movie.title,
+  year: movie.year.toString(),
+);
+MovieStatBadge(icon: Icons.star, label: movie.rating.toStringAsFixed(1));
+MovieStatBadge(icon: Icons.timer, label: '${movie.runtime}m');
+Text(movie.summary);</pre>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- Crucial Problem & Solution Analysis -->
+  <div class="section">
+    <div class="section-title">
+      <span>⚠️ تحليل الخطأ السابق وكيف تم حله: (Exception: Unexpected Error)</span>
+    </div>
+
+    <div class="error-box">
+      <b>السبب الجذري للمشكلة:</b><br>
+      في ملف <code>movie_model.dart</code>، كان حقل التقييم <code>rating = json['rating'];</code> معرّفاً كـ <code>double?</code>.<br>
+      عندما أعاد السيرفر في أحد الأفلام <code>"rating": 0</code> (وهو رقم صحيح <code>int</code> في لغة Dart)، أطلقت بيئة تشغيل دارت الاستثناء التالي:<br>
+      <code>type 'int' is not a subtype of type 'double?' in type cast</code>.
+    </div>
+
+    <div class="note-box">
+      <b>الحل الجذري المطبق:</b><br>
+      تم استخدام كائن <code>num?</code> العام للتحويل بأمان سواء جاء الرقم <code>0</code> أو <code>7.8</code>:<br>
+      <code>rating = (json['rating'] as num?)?.toDouble();</code><br>
+      وكذلك تأمين بقية الحقول مثل <code>genres</code> والمصفوفات ضد قيم الـ <code>null</code>.
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>الحقل في الـ JSON</th>
+          <th>طريقة القراءة القديمة (المسببة للخطأ)</th>
+          <th>طريقة القراءة الجديدة الآمنة ✅</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>"rating": 0</code></td>
+          <td><code>json['rating']</code> (TypeError)</td>
+          <td><code>(json['rating'] as num?)?.toDouble()</code></td>
+        </tr>
+        <tr>
+          <td><code>"year": 2026</code></td>
+          <td><code>json['year']</code></td>
+          <td><code>(json['year'] as num?)?.toInt()</code></td>
+        </tr>
+        <tr>
+          <td><code>"genres": null</code></td>
+          <td><code>json['genres'].cast&lt;String&gt;()</code></td>
+          <td><code>(json['genres'] as List?)?.map(...).toList()</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</body>
+</html>

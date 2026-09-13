@@ -27,7 +27,10 @@ class AppRouters {
       case RouteName.updateProfileScreen:
         return MaterialPageRoute(builder: (_) => const UpdateProfileScreen());
       case RouteName.movieDatailsScreen:
-        return MaterialPageRoute(builder: (_) => const MovieDetails());
+        return MaterialPageRoute(
+          builder: (_) => const MovieDetails(),
+          settings: settings,
+        );
 
       default:
         return MaterialPageRoute(

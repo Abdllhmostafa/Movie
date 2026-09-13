@@ -34,11 +34,13 @@ void main() {
   testWidgets('Movie App smoke test - verifies MyApp launches', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(
-      MyApp(authRemoteDataSource: FakeAuthRemoteDataSource()),
-    );
-    await tester.pump();
-    expect(find.byType(MaterialApp), findsOneWidget);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(
+        MyApp(authRemoteDataSource: FakeAuthRemoteDataSource()),
+      );
+      await tester.pump();
+      expect(find.byType(MaterialApp), findsOneWidget);
+    });
   });
 
   testWidgets('Verifies LoginScreen renders with theme, Sign In, and Google auth', (

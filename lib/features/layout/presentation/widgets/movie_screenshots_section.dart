@@ -29,17 +29,31 @@ class MovieScreenshotsSection extends StatelessWidget {
             padding: EdgeInsets.only(bottom: 12.h),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16.r),
-              child: Image.asset(
-                path,
-                fit: BoxFit.cover,
-                width: double.infinity,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  height: 140.h,
-                  width: double.infinity,
-                  color: AppColors.surface,
-                  child: Icon(Icons.image, color: AppColors.textGrey, size: 36.sp),
-                ),
-              ),
+              child: path.startsWith('http')
+                  ? Image.network(
+                      path,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        height: 140.h,
+                        width: double.infinity,
+                        color: AppColors.surface,
+                        child: Icon(Icons.image,
+                            color: AppColors.textGrey, size: 36.sp),
+                      ),
+                    )
+                  : Image.asset(
+                      path,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        height: 140.h,
+                        width: double.infinity,
+                        color: AppColors.surface,
+                        child: Icon(Icons.image,
+                            color: AppColors.textGrey, size: 36.sp),
+                      ),
+                    ),
             ),
           ),
         ),

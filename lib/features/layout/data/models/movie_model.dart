@@ -287,8 +287,19 @@ extension MoviesExtension on Movies {
     return MovieEntity(
       id: id ?? 0,
       title: title ?? '',
-      image: mediumCoverImage ?? largeCoverImage ?? '',
+      image: mediumCoverImage ?? largeCoverImage ?? smallCoverImage ?? '',
       rating: rating ?? 0.0,
+      year: year ?? 0,
+      runtime: runtime ?? 0,
+      summary: (summary != null && summary!.isNotEmpty)
+          ? summary!
+          : (descriptionFull ?? synopsis ?? ''),
+      genres: genres ?? const [],
+      backgroundImage: backgroundImageOriginal ??
+          backgroundImage ??
+          largeCoverImage ??
+          mediumCoverImage ??
+          '',
     );
   }
 }
