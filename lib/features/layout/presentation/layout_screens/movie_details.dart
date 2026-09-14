@@ -4,6 +4,7 @@ import 'package:movie_app/core/routes/route_name.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 import 'package:movie_app/features/layout/data/data_source/movie_remote_data_source.dart';
 import 'package:movie_app/features/layout/data/repo/repo_imp.dart';
+import 'package:movie_app/features/layout/data/data_source/user_movies_service.dart';
 import 'package:movie_app/features/layout/demain/entitiy/cast_entity.dart';
 import 'package:movie_app/features/layout/demain/entitiy/movie_entity.dart';
 import 'package:movie_app/features/layout/demain/use_case/get_movie_details_extra.dart';
@@ -23,7 +24,8 @@ class MovieDetails extends StatefulWidget {
 }
 
 class _MovieDetailsState extends State<MovieDetails> {
-  bool _isFavorite = false;
+  bool _isWatchlisted = false;
+  bool _isWishlisted = false;
   List<MovieEntity> _similarMoviesList = [];
   List<String> _screenshotsList = [];
   List<CastEntity> _castList = [];
@@ -31,6 +33,58 @@ class _MovieDetailsState extends State<MovieDetails> {
   bool _isLoadingSimilar = true;
   bool _isLoadingExtra = true;
   bool _isInit = true;
+
+  MovieEntity _extractMovie(Object? args) {
+    if (args is MovieEntity) {
+      return args;
+    } else if (args is Map) {
+      final id = args['id'] is int
+          ? args['id'] as int
+          : int.tryParse(args['id']?.toString() ?? '0') ?? 0;
+      final title = args['title']?.toString() ?? 'Movie Details';
+      final image = args['image']?.toString() ?? '';
+      final rating = args['rating'] is num
+          ? (args['rating'] as num).toDouble()
+          : double.tryParse(args['rating']?.toString() ?? '7.7') ?? 7.7;
+      final year = args['year'] is int
+          ? args['year'] as int
+          : int.tryParse(args['year']?.toString() ?? '0') ?? 0;
+      final runtime = args['runtime'] is int
+          ? args['runtime'] as int
+          : int.tryParse(args['runtime']?.toString() ?? '0') ?? 0;
+      final summary = args['summary']?.toString() ?? '';
+      List<String> genres = const [];
+      if (args['genres'] is List) {
+        genres = (args['genres'] as List).map((e) => e.toString()).toList();
+      } else if (args['genres'] is String && (args['genres'] as String).isNotEmpty) {
+        genres = (args['genres'] as String).split(', ');
+      }
+      final bg = args['backgroundImage']?.toString() ?? '';
+
+      return MovieEntity(
+        id: id,
+        title: title,
+        image: image,
+        rating: rating,
+        year: year,
+        runtime: runtime,
+        summary: summary,
+        genres: genres,
+        backgroundImage: bg,
+      );
+    }
+    return MovieEntity(
+      id: 0,
+      title: 'Movie Details',
+      image: '',
+      rating: 7.7,
+      year: 2024,
+      runtime: 120,
+      summary:
+          'Following unexpected multiverse events, heroes unite to protect reality from imminent collapse while discovering hidden strengths within themselves.',
+      genres: const ['Action', 'Adventure', 'Fantasy', 'Sci-Fi'],
+    );
+  }
 
   @override
   void didChangeDependencies() {
@@ -42,8 +96,25 @@ class _MovieDetailsState extends State<MovieDetails> {
   }
 
   Future<void> _fetchMovieDetailsExtra() async {
-    final movie = ModalRoute.of(context)?.settings.arguments as MovieEntity?;
-    if (movie == null || movie.id == 0) {
+    final movie = _extractMovie(ModalRoute.of(context)?.settings.arguments);
+
+    UserMoviesService.isWatchlisted(movie.id, title: movie.title).then((isWatch) {
+      if (mounted) {
+        setState(() {
+          _isWatchlisted = isWatch;
+        });
+      }
+    });
+
+    UserMoviesService.isWishlisted(movie.id, title: movie.title).then((isWish) {
+      if (mounted) {
+        setState(() {
+          _isWishlisted = isWish;
+        });
+      }
+    });
+
+    if (movie.id == 0) {
       if (mounted) {
         setState(() {
           _isLoadingSimilar = false;
@@ -130,19 +201,7 @@ class _MovieDetailsState extends State<MovieDetails> {
   @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
-    final movie =
-        (ModalRoute.of(context)?.settings.arguments as MovieEntity?) ??
-        MovieEntity(
-          id: 0,
-          title: 'Movie Details',
-          image: '',
-          rating: 7.7,
-          year: 2024,
-          runtime: 120,
-          summary:
-              'Following unexpected multiverse events, heroes unite to protect reality from imminent collapse while discovering hidden strengths within themselves.',
-          genres: const ['Action', 'Adventure', 'Fantasy', 'Sci-Fi'],
-        );
+    final movie = _extractMovie(ModalRoute.of(context)?.settings.arguments);
 
     final displayImage = movie.backgroundImage.isNotEmpty
         ? movie.backgroundImage
@@ -164,30 +223,30 @@ class _MovieDetailsState extends State<MovieDetails> {
                       height: 500,
                       child: displayImage.isNotEmpty
                           ? Image.network(
-                              displayImage,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Container(
-                                    color: AppColors.background,
-                                    child: const Center(
-                                      child: Icon(
-                                        Icons.movie_creation_outlined,
-                                        color: AppColors.cardBackground,
-                                        size: 64,
-                                      ),
-                                    ),
-                                  ),
-                            )
-                          : Container(
-                              color: AppColors.cardBackground,
+                        displayImage,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Container(
+                              color: AppColors.background,
                               child: const Center(
                                 child: Icon(
                                   Icons.movie_creation_outlined,
-                                  color: AppColors.gold,
+                                  color: AppColors.cardBackground,
                                   size: 64,
                                 ),
                               ),
                             ),
+                      )
+                          : Container(
+                        color: AppColors.cardBackground,
+                        child: const Center(
+                          child: Icon(
+                            Icons.movie_creation_outlined,
+                            color: AppColors.gold,
+                            size: 64,
+                          ),
+                        ),
+                      ),
                     ),
                     Positioned.fill(
                       child: Container(
@@ -219,28 +278,128 @@ class _MovieDetailsState extends State<MovieDetails> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header (Back, Favorite, Play, Title, Year, Watch Button)
+                    // Header (Back, Watchlist Bookmark, Play, Title, Year, Watch Button)
                     MovieDetailsHeader(
                       title: movie.title,
                       year: movie.year > 0 ? movie.year.toString() : '2024',
-                      isFavorite: _isFavorite,
+                      isFavorite: _isWatchlisted,
                       onBack: () => Navigator.of(context).pop(),
-                      onFavorite: () {
+                      onFavorite: () async {
+                        final messenger = ScaffoldMessenger.of(context);
+                        final isWatch = await UserMoviesService.toggleWatchlist(
+                          id: movie.id,
+                          title: movie.title,
+                          image: movie.image,
+                          rating: movie.rating,
+                          year: movie.year > 0 ? movie.year.toString() : '',
+                          runtime: movie.runtime,
+                          genres: movie.genres,
+                          summary: movie.summary,
+                          backgroundImage: movie.backgroundImage,
+                        );
+                        if (!mounted) return;
                         setState(() {
-                          _isFavorite = !_isFavorite;
+                          _isWatchlisted = isWatch;
                         });
+                        messenger.hideCurrentSnackBar();
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              isWatch
+                                  ? 'Added "${movie.title}" to Watch List'
+                                  : 'Removed "${movie.title}" from Watch List',
+                            ),
+                            duration: const Duration(seconds: 2),
+                            backgroundColor: isWatch
+                                ? AppColors.success
+                                : AppColors.cardBackground,
+                          ),
+                        );
+                      },
+                      onPlay: () {
+                        UserMoviesService.addToHistory(
+                          id: movie.id,
+                          title: movie.title,
+                          image: movie.image,
+                          rating: movie.rating,
+                          year: movie.year > 0 ? movie.year.toString() : '',
+                          runtime: movie.runtime,
+                          genres: movie.genres,
+                          summary: movie.summary,
+                          backgroundImage: movie.backgroundImage,
+                        );
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Playing "${movie.title}"...'),
+                            backgroundColor: AppColors.gold,
+                          ),
+                        );
+                      },
+                      onWatch: () {
+                        UserMoviesService.addToHistory(
+                          id: movie.id,
+                          title: movie.title,
+                          image: movie.image,
+                          rating: movie.rating,
+                          year: movie.year > 0 ? movie.year.toString() : '',
+                          runtime: movie.runtime,
+                          genres: movie.genres,
+                          summary: movie.summary,
+                          backgroundImage: movie.backgroundImage,
+                        );
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Watching "${movie.title}"...'),
+                            backgroundColor: AppColors.gold,
+                          ),
+                        );
                       },
                     ),
 
                     SizedBox(height: 20.h),
 
-                    // Stats Row (Likes, Duration, Rating)
+                    // Stats Row (Likes / Wish List, Duration, Rating)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         MovieStatBadge(
-                          icon: Icons.favorite,
-                          label: _isFavorite ? '16' : '15',
+                          icon: _isWishlisted ? Icons.favorite : Icons.favorite_border,
+                          iconColor: _isWishlisted ? AppColors.btnBgColor : AppColors.gold,
+                          label: '${15 + (_isWishlisted ? 1 : 0)}',
+                          onTap: () async {
+                            final messenger = ScaffoldMessenger.of(context);
+                            final isWish = await UserMoviesService.toggleWishlist(
+                              id: movie.id,
+                              title: movie.title,
+                              image: movie.image,
+                              rating: movie.rating,
+                              year: movie.year > 0 ? movie.year.toString() : '',
+                              runtime: movie.runtime,
+                              genres: movie.genres,
+                              summary: movie.summary,
+                              backgroundImage: movie.backgroundImage,
+                            );
+                            if (!mounted) return;
+                            setState(() {
+                              _isWishlisted = isWish;
+                            });
+                            messenger.hideCurrentSnackBar();
+                            messenger.showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  isWish
+                                      ? 'Added "${movie.title}" to Wish List'
+                                      : 'Removed "${movie.title}" from Wish List',
+                                ),
+                                duration: const Duration(seconds: 2),
+                                backgroundColor: isWish
+                                    ? AppColors.success
+                                    : AppColors.cardBackground,
+                              ),
+                            );
+                          },
                         ),
                         MovieStatBadge(
                           icon: Icons.timer,
@@ -263,7 +422,7 @@ class _MovieDetailsState extends State<MovieDetails> {
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 24),
                           child:
-                              CircularProgressIndicator(color: AppColors.gold),
+                          CircularProgressIndicator(color: AppColors.gold),
                         ),
                       )
                     else
@@ -290,7 +449,7 @@ class _MovieDetailsState extends State<MovieDetails> {
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 24),
                           child:
-                              CircularProgressIndicator(color: AppColors.gold),
+                          CircularProgressIndicator(color: AppColors.gold),
                         ),
                       )
                     else if (_similarMoviesList.isNotEmpty)
@@ -381,7 +540,7 @@ class _MovieDetailsState extends State<MovieDetails> {
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 20),
                           child:
-                              CircularProgressIndicator(color: AppColors.gold),
+                          CircularProgressIndicator(color: AppColors.gold),
                         ),
                       )
                     else
@@ -427,10 +586,10 @@ class _MovieDetailsState extends State<MovieDetails> {
                       spacing: 10.w,
                       runSpacing: 10.h,
                       children: (_genresList.isNotEmpty
-                              ? _genresList
-                              : (movie.genres.isNotEmpty
-                                  ? movie.genres
-                                  : _genres))
+                          ? _genresList
+                          : (movie.genres.isNotEmpty
+                          ? movie.genres
+                          : _genres))
                           .map((genre) => GenreChip(label: genre))
                           .toList(),
                     ),

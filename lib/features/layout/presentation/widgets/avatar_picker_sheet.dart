@@ -4,9 +4,14 @@ import 'package:movie_app/core/constants/app_assets.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 
 class AvatarPickerSheet extends StatelessWidget {
+  final String? currentAvatar;
   final void Function(String avatarPath)? onAvatarSelected;
 
-  const AvatarPickerSheet({super.key, this.onAvatarSelected});
+  const AvatarPickerSheet({
+    super.key,
+    this.currentAvatar,
+    this.onAvatarSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +27,6 @@ class AvatarPickerSheet extends StatelessWidget {
       AppAssets.gamer9,
     ];
 
-    const selectedIndex = 8;
-
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
@@ -37,7 +40,8 @@ class AvatarPickerSheet extends StatelessWidget {
         crossAxisSpacing: 18.w,
         mainAxisSpacing: 19.h,
         children: List.generate(avatars.length, (index) {
-          final isSelected = index == selectedIndex;
+          final isSelected = currentAvatar == avatars[index] ||
+              (currentAvatar == null && index == 8);
           return InkWell(
             onTap: () {
               onAvatarSelected?.call(avatars[index]);
@@ -50,7 +54,10 @@ class AvatarPickerSheet extends StatelessWidget {
                     ? AppColors.gold.withValues(alpha: 0.56)
                     : null,
                 borderRadius: BorderRadius.circular(20.r),
-                border: Border.all(color: AppColors.gold),
+                border: Border.all(
+                  color: isSelected ? AppColors.gold : Colors.white24,
+                  width: isSelected ? 2 : 1,
+                ),
               ),
               padding: EdgeInsets.all(4.r),
               child: ClipRRect(

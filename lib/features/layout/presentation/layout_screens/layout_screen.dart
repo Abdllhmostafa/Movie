@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 import 'package:movie_app/features/layout/presentation/layout_screens/home_screen.dart';
+import 'package:movie_app/features/layout/presentation/profile/manager/profile_cubit.dart';
 import 'package:movie_app/features/layout/presentation/profile/screens/profile_screen.dart';
 import 'package:movie_app/features/search-tap/presentation/screens/search_tab.dart';
 import 'package:movie_app/features/layout/presentation/widgets/bottom_nav_bar.dart';
@@ -15,6 +17,7 @@ class LayoutScreen extends StatefulWidget {
 
 class _LayoutScreenState extends State<LayoutScreen> {
   int _selectedIndex = 0;
+  late final ProfileCubit _profileCubit;
 
   final List<Widget> _screens = const [
     HomeScreen(),
@@ -24,20 +27,38 @@ class _LayoutScreenState extends State<LayoutScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _profileCubit = ProfileCubit()..getProfileData();
+  }
+
+  @override
+  void dispose() {
+    _profileCubit.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: IndexedStack(index: _selectedIndex, children: _screens),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-          child: BottomNavBar(
-            currentIndex: _selectedIndex,
-            onTap: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
+    return BlocProvider.value(
+      value: _profileCubit,
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: IndexedStack(index: _selectedIndex, children: _screens),
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+            child: BottomNavBar(
+              currentIndex: _selectedIndex,
+              onTap: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+                if (index == 3) {
+                  _profileCubit.getProfileData();
+                }
+              },
+            ),
           ),
         ),
       ),

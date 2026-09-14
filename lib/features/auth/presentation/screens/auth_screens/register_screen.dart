@@ -9,6 +9,7 @@ import 'package:movie_app/features/auth/presentation/widgets/auth_button_widget.
 import 'package:movie_app/features/auth/presentation/widgets/auth_prompt_row.dart';
 import 'package:movie_app/features/auth/presentation/widgets/register_form_widget.dart';
 import 'package:movie_app/features/auth/presentation/widgets/route_logo_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -35,14 +36,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _onRegisterPressed(BuildContext context) {
+  void _onRegisterPressed(BuildContext context) async {
     FocusScope.of(context).unfocus();
     if (_formKey.currentState?.validate() ?? false) {
-      context.read<AuthCubit>().register(
-        name: _nameController.text.trim(),
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
+      final phone = _phoneController.text.trim();
+      final name = _nameController.text.trim();
+      final prefs = await SharedPreferences.getInstance();
+      if (phone.isNotEmpty) {
+        await prefs.setString('pending_phone', phone);
+        await prefs.setString('user_phone', phone);
+      }
+      if (name.isNotEmpty) {
+        await prefs.setString('pending_name', name);
+        await prefs.setString('user_name', name);
+      }
+      if (context.mounted) {
+        context.read<AuthCubit>().register(
+          name: name,
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
+      }
     }
   }
 
@@ -69,6 +83,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
           listenWhen: (previous, current) => previous != current,
           listener: (context, state) {
             if (state is AuthSuccess) {
+              final uid = state.user.uID;
+              final phone = _phoneController.text.trim();
+              final name = _nameController.text.trim();
+              if (phone.isNotEmpty || name.isNotEmpty) {
+                SharedPreferences.getInstance().then((prefs) {
+                  if (name.isNotEmpty) prefs.setString('user_name_$uid', name);
+                  if (phone.isNotEmpty) prefs.setString('user_phone_$uid', phone);
+                });
+              }
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
