@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 import 'package:movie_app/features/layout/presentation/layout_screens/home_screen.dart';
 import 'package:movie_app/features/layout/presentation/profile/screens/profile_screen.dart';
-import 'package:movie_app/features/layout/presentation/layout_screens/search_tab.dart';
+import 'package:movie_app/features/search-tap/presentation/screens/search_tab.dart';
 import 'package:movie_app/features/layout/presentation/widgets/bottom_nav_bar.dart';
 
 class LayoutScreen extends StatefulWidget {
