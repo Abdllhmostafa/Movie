@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -38,8 +39,9 @@ class MyApp extends StatelessWidget {
         minTextAdapt: true,
         splitScreenMode: true,
         builder: (context, child) {
+          final isUserLoggedIn = FirebaseAuth.instance.currentUser != null;
           return MaterialApp(
-            initialRoute: RouteName.layout,
+            initialRoute: isUserLoggedIn ? RouteName.layout : RouteName.login,
             onGenerateRoute: appRouters.generateRoute,
             debugShowCheckedModeBanner: false,
             title: 'Route Movie App',

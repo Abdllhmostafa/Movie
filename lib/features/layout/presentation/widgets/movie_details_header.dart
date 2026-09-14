@@ -40,9 +40,9 @@ class MovieDetailsHeader extends StatelessWidget {
             IconButton(
               onPressed: onFavorite,
               icon: Icon(
-                isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: isFavorite ? AppColors.primary : AppColors.white,
-                size: 26.sp,
+                isFavorite ? Icons.bookmark : Icons.bookmark_border,
+                color: isFavorite ? AppColors.gold : AppColors.white,
+                size: 28.sp,
               ),
             ),
           ],
