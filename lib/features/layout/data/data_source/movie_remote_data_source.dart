@@ -4,12 +4,14 @@ import 'package:movie_app/core/network/dio_sevice.dart';
 import 'package:movie_app/features/layout/data/models/movie_model.dart';
 import 'package:movie_app/features/layout/demain/entitiy/cast_entity.dart';
 import 'package:movie_app/features/layout/demain/entitiy/movie_details_extra_entity.dart';
+import 'package:movie_app/features/search-tap/data/models/search_model.dart';
 
 abstract class MovieRemoteDataSource {
   Future<List<Movies>> getMovies();
   Future<List<Movies>> getSimilarMovies(int movieId);
   Future<List<String>> getMovieScreenshots(int movieId);
   Future<MovieDetailsExtraEntity> getMovieDetailsExtra(int movieId);
+  Future<List<SearchMovies>> getSearchMovies([String query = '']);
 }
 
 class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
@@ -90,7 +92,8 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
         // Screenshots
         final List<String> screenshots = [];
         for (int i = 1; i <= 3; i++) {
-          final shot = movie['large_screenshot_image$i']?.toString() ??
+          final shot =
+              movie['large_screenshot_image$i']?.toString() ??
               movie['medium_screenshot_image$i']?.toString();
           if (shot != null && shot.isNotEmpty) {
             screenshots.add(shot);
@@ -132,6 +135,34 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
       return const MovieDetailsExtraEntity();
     } catch (_) {
       return const MovieDetailsExtraEntity();
+    }
+  }
+
+  @override
+  Future<List<SearchMovies>> getSearchMovies([String query = '']) async {
+    try {
+      final response = await DioSevice.dio.get(
+        'https://movies-api.accel.li/api/v2/list_movies.json',
+        queryParameters:
+            query.trim().isNotEmpty ? {'query_term': query.trim()} : null,
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = response.data is String
+            ? jsonDecode(response.data as String) as Map<String, dynamic>
+            : (response.data as Map<String, dynamic>);
+        final searchModel = SearchModel.fromJson(data);
+        return searchModel.data?.searchmovies ?? [];
+      } else {
+        throw Exception('Failed to load movies (${response.statusCode})');
+      }
+    } on DioException catch (e) {
+      final message = e.response?.data is Map
+          ? (e.response?.data['status_message']?.toString())
+          : null;
+      throw Exception(message ?? e.message ?? 'Network Error');
+    } catch (e) {
+      throw Exception(e.toString().replaceFirst('Exception: ', ''));
     }
   }
 }
