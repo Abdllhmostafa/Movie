@@ -10,5 +10,11 @@ abstract class AuthRepo {
     required String name,
     required String email,
     required String password,
+    String? avatar,
   });
+  Future<Either<String, Unit>> resetPassword({
+    required String email,
+  });
+  Future<Either<String, UserEntity>> signInWithGoogle();
 }
+

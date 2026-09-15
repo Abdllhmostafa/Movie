@@ -28,6 +28,14 @@ class FakeAuthRemoteDataSource implements AuthRemoteDataSource {
   }) {
     throw UnimplementedError();
   }
+
+  @override
+  Future<void> resetPassword({required String email}) async {}
+
+  @override
+  Future<UserCredential> signInWithGoogle() {
+    throw UnimplementedError();
+  }
 }
 
 void main() {

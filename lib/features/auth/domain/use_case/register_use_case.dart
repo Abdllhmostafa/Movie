@@ -11,7 +11,13 @@ class RegisterUseCase {
     required String name,
     required String email,
     required String password,
+    String? avatar,
   }) {
-    return repo.register(name: name, email: email, password: password);
+    return repo.register(
+      name: name,
+      email: email,
+      password: password,
+      avatar: avatar,
+    );
   }
 }

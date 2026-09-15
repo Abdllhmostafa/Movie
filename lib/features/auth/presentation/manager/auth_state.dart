@@ -25,3 +25,10 @@ class AuthFailure extends AuthState {
   final String errorMessage;
   const AuthFailure(this.errorMessage);
 }
+
+/// Password Reset Email Sent State
+class AuthPasswordResetSent extends AuthState {
+  final String email;
+  const AuthPasswordResetSent(this.email);
+}
+

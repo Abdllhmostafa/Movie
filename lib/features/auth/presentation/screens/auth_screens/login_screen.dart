@@ -44,7 +44,101 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _onGoogleSignIn(BuildContext context) {
-    Navigator.pushReplacementNamed(context, RouteName.layout);
+    context.read<AuthCubit>().signInWithGoogle();
+  }
+
+  void _showForgotPasswordDialog(BuildContext context) {
+    final resetEmailController =
+        TextEditingController(text: _emailController.text.trim());
+    final resetFormKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        backgroundColor: AppColors.cardBackground,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+        title: Text(
+          'Reset Password',
+          style: TextStyle(
+              color: AppColors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 18.sp),
+        ),
+        content: Form(
+          key: resetFormKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Enter your email and we will send you a password reset link.',
+                style: TextStyle(color: AppColors.textGrey, fontSize: 14.sp),
+              ),
+              SizedBox(height: 16.h),
+              TextFormField(
+                controller: resetEmailController,
+                keyboardType: TextInputType.emailAddress,
+                style: TextStyle(color: AppColors.white, fontSize: 15.sp),
+                cursorColor: AppColors.gold,
+                decoration: InputDecoration(
+                  hintText: 'Enter your email',
+                  hintStyle:
+                      TextStyle(color: AppColors.textGrey, fontSize: 14.sp),
+                  prefixIcon:
+                      const Icon(Icons.email_outlined, color: AppColors.gold),
+                  fillColor: AppColors.inputFill,
+                  filled: true,
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: BorderSide.none),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: const BorderSide(color: AppColors.gold)),
+                ),
+                validator: (val) {
+                  if (val == null || val.trim().isEmpty) {
+                    return 'Please enter your email';
+                  }
+                  final emailRegex =
+                      RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                  if (!emailRegex.hasMatch(val.trim())) {
+                    return 'Please enter a valid email';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child:
+                const Text('Cancel', style: TextStyle(color: AppColors.textGrey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.gold,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.r)),
+            ),
+            onPressed: () {
+              if (resetFormKey.currentState?.validate() ?? false) {
+                final email = resetEmailController.text.trim();
+                Navigator.pop(dialogCtx);
+                context.read<AuthCubit>().resetPassword(email);
+              }
+            },
+            child: Text('Send Link',
+                style: TextStyle(
+                    color: AppColors.background,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14.sp)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -67,6 +161,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               );
               Navigator.pushReplacementNamed(context, RouteName.layout);
+            } else if (state is AuthPasswordResetSent) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Password reset email sent to ${state.email}. Check your inbox!',
+                  ),
+                  backgroundColor: AppColors.success,
+                ),
+              );
             } else if (state is AuthFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -98,13 +201,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         emailController: _emailController,
                         passwordController: _passwordController,
                         onSubmitted: () => _onLoginPressed(context),
-                        onForgotPassword: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Forgot Password clicked'),
-                            ),
-                          );
-                        },
+                        onForgotPassword: () =>
+                            _showForgotPasswordDialog(context),
                       ),
                       SizedBox(height: 30.h),
                       AuthButtonWidget(

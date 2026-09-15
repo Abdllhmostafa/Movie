@@ -51,7 +51,10 @@ class _ProfileScreenBody extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text("Cancel", style: TextStyle(color: AppColors.white)),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(color: AppColors.white),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -91,11 +94,13 @@ class _ProfileScreenBody extends StatelessWidget {
       },
       builder: (context, state) {
         final currentUser = FirebaseAuth.instance.currentUser;
-        String name = (currentUser?.displayName != null &&
+        String name =
+            (currentUser?.displayName != null &&
                 currentUser!.displayName!.trim().isNotEmpty)
             ? currentUser.displayName!.trim()
             : (currentUser?.email?.split('@').first ?? "User");
-        String avatar = (currentUser?.photoURL != null &&
+        String avatar =
+            (currentUser?.photoURL != null &&
                 currentUser!.photoURL!.trim().isNotEmpty)
             ? currentUser.photoURL!.trim()
             : AppAssets.gamer9;
@@ -131,28 +136,57 @@ class _ProfileScreenBody extends StatelessWidget {
                             right: 26.w,
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            spacing: 16.w,
                             children: [
-                              Column(
-                                children: [
-                                  ClipOval(
-                                    child: Image.asset(
-                                      avatar,
-                                      width: 118.w,
-                                      height: 118.h,
-                                      fit: BoxFit.cover,
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    ClipOval(
+                                      child: avatar.startsWith('http')
+                                          ? Image.network(
+                                              avatar,
+                                              width: 118.w,
+                                              height: 118.h,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error,
+                                                      stackTrace) =>
+                                                  Image.asset(
+                                                AppAssets.gamer9,
+                                                width: 118.w,
+                                                height: 118.h,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            )
+                                          : Image.asset(
+                                              avatar,
+                                              width: 118.w,
+                                              height: 118.h,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error,
+                                                      stackTrace) =>
+                                                  Container(
+                                                width: 118.w,
+                                                height: 118.h,
+                                                color: AppColors.cardBackground,
+                                                child: Icon(
+                                                  Icons.person,
+                                                  size: 50.sp,
+                                                  color: AppColors.textGrey,
+                                                ),
+                                              ),
+                                            ),
                                     ),
-                                  ),
-                                  SizedBox(height: 14.h),
-                                  Text(
-                                    name,
-                                    style: TextStyle(
-                                      color: AppColors.white,
-                                      fontSize: 20.sp,
-                                      fontWeight: FontWeight.bold,
+                                    SizedBox(height: 14.h),
+                                    Text(
+                                      name,
+                                      style: TextStyle(
+                                        color: AppColors.white,
+                                        fontSize: 20.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                               Column(
                                 children: [
@@ -341,11 +375,11 @@ class _ProfileScreenBody extends StatelessWidget {
                             itemCount: watchlistMovies.length,
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 16.w,
-                              mainAxisSpacing: 16.h,
-                              childAspectRatio: 122 / 180,
-                            ),
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 16.w,
+                                  mainAxisSpacing: 16.h,
+                                  childAspectRatio: 122 / 180,
+                                ),
                             itemBuilder: (context, index) {
                               final movie = watchlistMovies[index];
                               return MovieCard(
@@ -356,19 +390,31 @@ class _ProfileScreenBody extends StatelessWidget {
                                     context,
                                     RouteName.movieDatailsScreen,
                                     arguments: {
-                                      'id': int.tryParse(movie['id'] ?? '0') ?? 0,
+                                      'id':
+                                          int.tryParse(movie['id'] ?? '0') ?? 0,
                                       'title': movie['title'] ?? '',
                                       'image': movie['image'] ?? '',
-                                      'rating': double.tryParse(movie['rating'] ?? '0.0') ?? 0.0,
+                                      'rating':
+                                          double.tryParse(
+                                            movie['rating'] ?? '0.0',
+                                          ) ??
+                                          0.0,
                                       'year': movie['year'] ?? '',
-                                      'runtime': int.tryParse(movie['runtime'] ?? '0') ?? 0,
+                                      'runtime':
+                                          int.tryParse(
+                                            movie['runtime'] ?? '0',
+                                          ) ??
+                                          0,
                                       'genres': movie['genres'] ?? '',
                                       'summary': movie['summary'] ?? '',
-                                      'backgroundImage': movie['backgroundImage'] ?? '',
+                                      'backgroundImage':
+                                          movie['backgroundImage'] ?? '',
                                     },
                                   );
                                   if (context.mounted) {
-                                    context.read<ProfileCubit>().getProfileData();
+                                    context
+                                        .read<ProfileCubit>()
+                                        .getProfileData();
                                   }
                                 },
                               );
@@ -404,11 +450,11 @@ class _ProfileScreenBody extends StatelessWidget {
                             itemCount: historyMovies.length,
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 16.w,
-                              mainAxisSpacing: 16.h,
-                              childAspectRatio: 122 / 180,
-                            ),
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 16.w,
+                                  mainAxisSpacing: 16.h,
+                                  childAspectRatio: 122 / 180,
+                                ),
                             itemBuilder: (context, index) {
                               final movie = historyMovies[index];
                               return MovieCard(
@@ -419,19 +465,31 @@ class _ProfileScreenBody extends StatelessWidget {
                                     context,
                                     RouteName.movieDatailsScreen,
                                     arguments: {
-                                      'id': int.tryParse(movie['id'] ?? '0') ?? 0,
+                                      'id':
+                                          int.tryParse(movie['id'] ?? '0') ?? 0,
                                       'title': movie['title'] ?? '',
                                       'image': movie['image'] ?? '',
-                                      'rating': double.tryParse(movie['rating'] ?? '0.0') ?? 0.0,
+                                      'rating':
+                                          double.tryParse(
+                                            movie['rating'] ?? '0.0',
+                                          ) ??
+                                          0.0,
                                       'year': movie['year'] ?? '',
-                                      'runtime': int.tryParse(movie['runtime'] ?? '0') ?? 0,
+                                      'runtime':
+                                          int.tryParse(
+                                            movie['runtime'] ?? '0',
+                                          ) ??
+                                          0,
                                       'genres': movie['genres'] ?? '',
                                       'summary': movie['summary'] ?? '',
-                                      'backgroundImage': movie['backgroundImage'] ?? '',
+                                      'backgroundImage':
+                                          movie['backgroundImage'] ?? '',
                                     },
                                   );
                                   if (context.mounted) {
-                                    context.read<ProfileCubit>().getProfileData();
+                                    context
+                                        .read<ProfileCubit>()
+                                        .getProfileData();
                                   }
                                 },
                               );
