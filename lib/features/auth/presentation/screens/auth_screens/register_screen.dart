@@ -10,7 +10,6 @@ import 'package:movie_app/features/auth/presentation/manager/auth_state.dart';
 import 'package:movie_app/features/auth/presentation/widgets/auth_button_widget.dart';
 import 'package:movie_app/features/auth/presentation/widgets/auth_prompt_row.dart';
 import 'package:movie_app/features/auth/presentation/widgets/register_form_widget.dart';
-import 'package:movie_app/features/auth/presentation/widgets/route_logo_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
