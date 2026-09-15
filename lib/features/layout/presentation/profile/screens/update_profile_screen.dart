@@ -53,7 +53,8 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
     String avatar = "";
 
     if (user != null) {
-      phone = prefs.getString('user_phone_${user.uid}') ??
+      phone =
+          prefs.getString('user_phone_${user.uid}') ??
           prefs.getString('user_phone') ??
           prefs.getString('pending_phone') ??
           (user.phoneNumber ?? "");
@@ -61,15 +62,15 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
       name = (user.displayName != null && user.displayName!.isNotEmpty)
           ? user.displayName!
           : (prefs.getString('user_name_${user.uid}') ??
-              prefs.getString('user_name') ??
-              prefs.getString('pending_name') ??
-              (user.email?.split('@').first ?? ""));
+                prefs.getString('user_name') ??
+                prefs.getString('pending_name') ??
+                (user.email?.split('@').first ?? ""));
 
       avatar = (user.photoURL != null && user.photoURL!.isNotEmpty)
           ? user.photoURL!
           : (prefs.getString('user_avatar_${user.uid}') ??
-              prefs.getString('user_avatar') ??
-              AppAssets.gamer9);
+                prefs.getString('user_avatar') ??
+                AppAssets.gamer9);
     }
 
     if (mounted) {
@@ -136,17 +137,21 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text("Cancel", style: TextStyle(color: AppColors.white)),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(color: AppColors.white),
+            ),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
             onPressed: () {
               Navigator.pop(dialogCtx);
               context.read<ProfileCubit>().deleteAccount();
             },
-            child: const Text("Delete", style: TextStyle(color: AppColors.white)),
+            child: const Text(
+              "Delete",
+              style: TextStyle(color: AppColors.white),
+            ),
           ),
         ],
       ),
@@ -158,7 +163,9 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
     return BlocConsumer<ProfileCubit, ProfileState>(
       listener: (context, state) {
         if (state is ProfileLoadedState) {
-          if (state.name.isNotEmpty && state.name != "User" && _nameController.text.isEmpty) {
+          if (state.name.isNotEmpty &&
+              state.name != "User" &&
+              _nameController.text.isEmpty) {
             _nameController.text = state.name;
           }
           if (state.phone.isNotEmpty && _phoneController.text.isEmpty) {
@@ -250,12 +257,37 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
                       );
                     },
                     child: ClipOval(
-                      child: Image.asset(
-                        _selectedAvatar,
-                        width: 150.w,
-                        height: 150.h,
-                        fit: BoxFit.cover,
-                      ),
+                      child: _selectedAvatar.startsWith('http')
+                          ? Image.network(
+                              _selectedAvatar,
+                              width: 150.w,
+                              height: 150.h,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Image.asset(
+                                AppAssets.gamer9,
+                                width: 150.w,
+                                height: 150.h,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : Image.asset(
+                              _selectedAvatar,
+                              width: 150.w,
+                              height: 150.h,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
+                                width: 150.w,
+                                height: 150.h,
+                                color: AppColors.cardBackground,
+                                child: Icon(
+                                  Icons.person,
+                                  size: 60.sp,
+                                  color: AppColors.textGrey,
+                                ),
+                              ),
+                            ),
                     ),
                   ),
                 ),
@@ -279,8 +311,8 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
                     onTap: isLoading
                         ? null
                         : () => context
-                            .read<ProfileCubit>()
-                            .sendPasswordResetEmail(),
+                              .read<ProfileCubit>()
+                              .sendPasswordResetEmail(),
                     child: Text(
                       "Reset Password",
                       style: TextStyle(
@@ -316,10 +348,10 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
                             return;
                           }
                           context.read<ProfileCubit>().updateProfileData(
-                                name: name,
-                                avatar: _selectedAvatar,
-                                phone: _phoneController.text.trim(),
-                              );
+                            name: name,
+                            avatar: _selectedAvatar,
+                            phone: _phoneController.text.trim(),
+                          );
                         },
                   text: isLoading ? "Updating..." : "Update Data",
                   backgroundColor: AppColors.gold,

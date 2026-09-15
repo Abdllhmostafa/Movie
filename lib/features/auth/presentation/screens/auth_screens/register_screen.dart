@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:movie_app/core/constants/app_assets.dart';
 import 'package:movie_app/core/routes/route_name.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 import 'package:movie_app/features/auth/presentation/manager/auth_cubit.dart';
@@ -9,6 +10,7 @@ import 'package:movie_app/features/auth/presentation/widgets/auth_button_widget.
 import 'package:movie_app/features/auth/presentation/widgets/auth_prompt_row.dart';
 import 'package:movie_app/features/auth/presentation/widgets/register_form_widget.dart';
 import 'package:movie_app/features/auth/presentation/widgets/route_logo_widget.dart';
+import 'package:movie_app/features/layout/presentation/widgets/avatar_picker_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -25,6 +27,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _rePasswordController = TextEditingController();
   final _phoneController = TextEditingController();
+  String _selectedAvatar = AppAssets.gamer1;
+
+  final List<String> _avatars = const [
+    AppAssets.gamer1,
+    AppAssets.gamer2,
+    AppAssets.gamer3,
+    AppAssets.gamer4,
+    AppAssets.gamer5,
+    AppAssets.gamer6,
+    AppAssets.gamer7,
+    AppAssets.gamer8,
+    AppAssets.gamer9,
+  ];
 
   @override
   void dispose() {
@@ -42,6 +57,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final phone = _phoneController.text.trim();
       final name = _nameController.text.trim();
       final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('pending_avatar', _selectedAvatar);
+      await prefs.setString('user_avatar', _selectedAvatar);
       if (phone.isNotEmpty) {
         await prefs.setString('pending_phone', phone);
         await prefs.setString('user_phone', phone);
@@ -55,13 +72,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
           name: name,
           email: _emailController.text.trim(),
           password: _passwordController.text,
+          avatar: _selectedAvatar,
         );
       }
     }
   }
 
   void _onGoogleSignIn(BuildContext context) {
-    Navigator.pushReplacementNamed(context, RouteName.layout);
+    context.read<AuthCubit>().signInWithGoogle();
   }
 
   @override
@@ -86,21 +104,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
               final uid = state.user.uID;
               final phone = _phoneController.text.trim();
               final name = _nameController.text.trim();
-              if (phone.isNotEmpty || name.isNotEmpty) {
-                SharedPreferences.getInstance().then((prefs) {
-                  if (name.isNotEmpty) prefs.setString('user_name_$uid', name);
-                  if (phone.isNotEmpty) prefs.setString('user_phone_$uid', phone);
-                });
-              }
+              SharedPreferences.getInstance().then((prefs) {
+                if (name.isNotEmpty) prefs.setString('user_name_$uid', name);
+                if (phone.isNotEmpty) {
+                  prefs.setString('user_phone_$uid', phone);
+                }
+                prefs.setString('user_avatar_$uid', _selectedAvatar);
+              });
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    'Welcome to Route Movies, ${state.user.name ?? "Movie Lover"}!',
+                    'please login with your recently added email, ${state.user.name ?? "Movie Lover"}!',
                   ),
                   backgroundColor: AppColors.success,
                 ),
               );
-              Navigator.pushReplacementNamed(context, RouteName.layout);
+              Navigator.pushReplacementNamed(context, RouteName.login);
             } else if (state is AuthFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -121,7 +140,98 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const RouteLogoWidget(iconSize: 52, fontSize: 26),
-                    SizedBox(height: 24.h),
+                    SizedBox(height: 16.h),
+                    Center(
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(55.r),
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            backgroundColor: Colors.transparent,
+                            isScrollControlled: true,
+                            builder: (_) => Padding(
+                              padding: EdgeInsets.all(16.r),
+                              child: AvatarPickerSheet(
+                                currentAvatar: _selectedAvatar,
+                                onAvatarSelected: (avatar) {
+                                  setState(() {
+                                    _selectedAvatar = avatar;
+                                  });
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                        child: Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            ClipOval(
+                              child: Image.asset(
+                                _selectedAvatar,
+                                width: 96.w,
+                                height: 96.h,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.all(6.r),
+                              decoration: const BoxDecoration(
+                                color: AppColors.gold,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.edit,
+                                size: 16.sp,
+                                color: AppColors.background,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    SizedBox(
+                      height: 56.h,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        shrinkWrap: true,
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: _avatars.length,
+                        separatorBuilder: (_, _) => SizedBox(width: 10.w),
+                        itemBuilder: (context, index) {
+                          final avatar = _avatars[index];
+                          final isSelected = _selectedAvatar == avatar;
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedAvatar = avatar;
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: isSelected
+                                      ? AppColors.gold
+                                      : Colors.transparent,
+                                  width: 2.5,
+                                ),
+                              ),
+                              padding: EdgeInsets.all(2.r),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  avatar,
+                                  width: 48.w,
+                                  height: 48.h,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
                     RegisterFormWidget(
                       formKey: _formKey,
                       nameController: _nameController,

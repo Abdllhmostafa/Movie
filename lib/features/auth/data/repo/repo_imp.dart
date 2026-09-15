@@ -38,6 +38,7 @@ class AuthRepoImp implements AuthRepo {
     required String name,
     required String email,
     required String password,
+    String? avatar,
   }) async {
     try {
       final userCredential = await authRemoteDataSource.register(
@@ -46,6 +47,9 @@ class AuthRepoImp implements AuthRepo {
       );
       if (userCredential.user != null) {
         await userCredential.user!.updateDisplayName(name);
+        if (avatar != null && avatar.isNotEmpty) {
+          await userCredential.user!.updatePhotoURL(avatar);
+        }
         final userModel = UserModel(
           email: userCredential.user!.email ?? email,
           uID: userCredential.user!.uid,
@@ -61,6 +65,36 @@ class AuthRepoImp implements AuthRepo {
       return Left(e.toString());
     }
   }
+
+  @override
+  Future<Either<String, Unit>> resetPassword({required String email}) async {
+    try {
+      await authRemoteDataSource.resetPassword(email: email);
+      return const Right(unit);
+    } on FirebaseAuthException catch (e) {
+      return Left(_mapFirebaseError(e));
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<String, UserEntity>> signInWithGoogle() async {
+    try {
+      final userCredential = await authRemoteDataSource.signInWithGoogle();
+      if (userCredential.user != null) {
+        final userModel = UserModel.fromFirebase(userCredential.user!);
+        return Right(userModel);
+      } else {
+        return const Left('Google sign-in cancelled or failed.');
+      }
+    } on FirebaseAuthException catch (e) {
+      return Left(_mapFirebaseError(e));
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
 
   String _mapFirebaseError(FirebaseAuthException e) {
     // ignore: avoid_print
