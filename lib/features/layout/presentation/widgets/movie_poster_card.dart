@@ -23,7 +23,8 @@ class MoviePosterCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(16.r),
-      onTap: onTap ??
+      onTap:
+          onTap ??
           () {
             Navigator.pushNamed(context, RouteName.movieDatailsScreen);
           },
@@ -42,8 +43,11 @@ class MoviePosterCard extends StatelessWidget {
                         width: width,
                         height: height,
                         color: AppColors.cardBackground,
-                        child: Icon(Icons.movie,
-                            color: AppColors.textGrey, size: 32.sp),
+                        child: Icon(
+                          Icons.movie,
+                          color: AppColors.textGrey,
+                          size: 32.sp,
+                        ),
                       ),
                     )
                   : Image.asset(
@@ -53,8 +57,11 @@ class MoviePosterCard extends StatelessWidget {
                         width: width,
                         height: height,
                         color: AppColors.cardBackground,
-                        child: Icon(Icons.movie,
-                            color: AppColors.textGrey, size: 32.sp),
+                        child: Icon(
+                          Icons.movie,
+                          color: AppColors.textGrey,
+                          size: 32.sp,
+                        ),
                       ),
                     ),
             ),
