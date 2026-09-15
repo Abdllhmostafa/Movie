@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:movie_app/core/routes/route_name.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 import 'package:movie_app/features/layout/data/data_source/movie_remote_data_source.dart';
@@ -133,7 +134,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                           movies: movies,
                         ),
 
-                        SizedBox(height: height * 0.02),
+                        SizedBox(height: 60.h),
                       ],
                     ),
                   ),
@@ -238,7 +239,7 @@ class _HomeCarousel extends StatelessWidget {
             initialPage: initialIndex,
             viewportFraction: 0.5,
             enlargeCenterPage: true,
-            autoPlay: false,
+            autoPlay: true,
             disableCenter: true,
             animateToClosest: true,
             onPageChanged: (index, reason) => onPageChanged(index),

@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,7 +11,6 @@ import 'package:movie_app/features/auth/presentation/widgets/auth_button_widget.
 import 'package:movie_app/features/auth/presentation/widgets/auth_prompt_row.dart';
 import 'package:movie_app/features/auth/presentation/widgets/register_form_widget.dart';
 import 'package:movie_app/features/auth/presentation/widgets/route_logo_widget.dart';
-import 'package:movie_app/features/layout/presentation/widgets/avatar_picker_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -139,97 +139,61 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const RouteLogoWidget(iconSize: 52, fontSize: 26),
                     SizedBox(height: 16.h),
-                    Center(
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(55.r),
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            backgroundColor: Colors.transparent,
-                            isScrollControlled: true,
-                            builder: (_) => Padding(
-                              padding: EdgeInsets.all(16.r),
-                              child: AvatarPickerSheet(
-                                currentAvatar: _selectedAvatar,
-                                onAvatarSelected: (avatar) {
-                                  setState(() {
-                                    _selectedAvatar = avatar;
-                                  });
-                                },
-                              ),
-                            ),
-                          );
-                        },
-                        child: Stack(
-                          alignment: Alignment.bottomRight,
-                          children: [
-                            ClipOval(
-                              child: Image.asset(
-                                _selectedAvatar,
-                                width: 96.w,
-                                height: 96.h,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(6.r),
-                              decoration: const BoxDecoration(
-                                color: AppColors.gold,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.edit,
-                                size: 16.sp,
-                                color: AppColors.background,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 12.h),
-                    SizedBox(
-                      height: 56.h,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        shrinkWrap: true,
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: _avatars.length,
-                        separatorBuilder: (_, _) => SizedBox(width: 10.w),
-                        itemBuilder: (context, index) {
-                          final avatar = _avatars[index];
-                          final isSelected = _selectedAvatar == avatar;
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedAvatar = avatar;
-                              });
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: isSelected
-                                      ? AppColors.gold
-                                      : Colors.transparent,
-                                  width: 2.5,
-                                ),
-                              ),
-                              padding: EdgeInsets.all(2.r),
-                              child: ClipOval(
-                                child: Image.asset(
-                                  avatar,
-                                  width: 48.w,
-                                  height: 48.h,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          );
+                    // Single row avatar picker carousel slider
+                    CarouselSlider.builder(
+                      itemCount: _avatars.length,
+                      options: CarouselOptions(
+                        height: 105.h,
+                        initialPage: 0,
+                        viewportFraction: 0.28,
+                        enlargeCenterPage: true,
+                        enlargeFactor: 0.35,
+                        enableInfiniteScroll: true,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            _selectedAvatar = _avatars[index];
+                          });
                         },
                       ),
+                      itemBuilder: (context, index, realIndex) {
+                        final avatar = _avatars[index];
+                        final isSelected = _selectedAvatar == avatar;
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedAvatar = avatar;
+                            });
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected
+                                    ? AppColors.gold
+                                    : Colors.transparent,
+                                width: isSelected ? 2.5 : 0,
+                              ),
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: AppColors.gold.withValues(
+                                          alpha: 0.4,
+                                        ),
+                                        blurRadius: 10,
+                                        spreadRadius: 2,
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                            padding: EdgeInsets.all(isSelected ? 3.r : 0),
+                            child: ClipOval(
+                              child: Image.asset(avatar, fit: BoxFit.cover),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                     SizedBox(height: 20.h),
                     RegisterFormWidget(
