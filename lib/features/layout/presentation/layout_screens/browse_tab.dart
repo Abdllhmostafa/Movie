@@ -36,7 +36,8 @@ class BrowseTabContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
+      body: Padding(
+        padding: const EdgeInsets.only(top: 16.0),
         child: BlocBuilder<MovieCubit, MovieState>(
           builder: (context, state) {
             if (state is MovieLoadingState) {
@@ -179,9 +180,11 @@ class BrowseTabContent extends StatelessWidget {
                         child: TabBarView(
                           children: genres.map((genre) {
                             final genreMovies = movies.where((movie) {
-                              return movie.genres.any((g) =>
-                                  g.trim().toLowerCase() ==
-                                  genre.toLowerCase());
+                              return movie.genres.any(
+                                (g) =>
+                                    g.trim().toLowerCase() ==
+                                    genre.toLowerCase(),
+                              );
                             }).toList();
 
                             if (genreMovies.isEmpty) {
@@ -217,11 +220,11 @@ class BrowseTabContent extends StatelessWidget {
                               ),
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 14.w,
-                                mainAxisSpacing: 14.h,
-                                childAspectRatio: 0.7,
-                              ),
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 14.w,
+                                    mainAxisSpacing: 14.h,
+                                    childAspectRatio: 0.7,
+                                  ),
                               itemCount: genreMovies.length,
                               itemBuilder: (context, index) {
                                 final movie = genreMovies[index];
