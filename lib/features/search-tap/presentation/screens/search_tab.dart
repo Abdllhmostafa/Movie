@@ -21,9 +21,7 @@ class SearchTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => SearchCubit(
-        SearchUseCase(
-          SearchRepoImp(SearchRemoteDataSourceImpl()),
-        ),
+        SearchUseCase(SearchRepoImp(SearchRemoteDataSourceImpl())),
       ),
       child: SearchTabContent(showBottomNav: showBottomNav),
     );
@@ -63,182 +61,202 @@ class _SearchTabContentState extends State<SearchTabContent> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          child: Column(
-            children: [
-              TextField(
-                controller: _searchController,
-                style: TextStyle(color: AppColors.white, fontSize: 16.sp),
-                cursorColor: AppColors.gold,
-                onChanged: (val) {
-                  setState(() {});
-                  _onSearchChanged(val);
-                },
-                onSubmitted: (val) {
-                  _debounceTimer?.cancel();
-                  context.read<SearchCubit>().searchMovies(val);
-                },
-                decoration: InputDecoration(
-                  prefixIcon:
-                      Icon(Icons.search, color: AppColors.gold, size: 24.sp),
-                  suffixIcon: _searchController.text.isNotEmpty
-                      ? IconButton(
-                          icon: Icon(Icons.close,
-                              color: AppColors.textGrey, size: 20.sp),
-                          onPressed: () {
-                            _debounceTimer?.cancel();
-                            _searchController.clear();
-                            setState(() {});
-                            context.read<SearchCubit>().clearSearch();
-                          },
-                        )
-                      : null,
-                  hintText: 'Search movies...',
-                  hintStyle:
-                      TextStyle(color: AppColors.textGrey, fontSize: 16.sp),
-                  fillColor: AppColors.inputFill,
-                  filled: true,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16.r),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16.r),
-                    borderSide: BorderSide(
-                      color: AppColors.gold.withValues(alpha: 0.1),
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16.r),
-                    borderSide: const BorderSide(color: AppColors.gold),
+      body: Padding(
+        padding: EdgeInsets.only(top: 32.h, right: 16.w, left: 16.w),
+        child: Column(
+          children: [
+            TextField(
+              controller: _searchController,
+              style: TextStyle(color: AppColors.white, fontSize: 16.sp),
+              cursorColor: AppColors.gold,
+              onChanged: (val) {
+                setState(() {});
+                _onSearchChanged(val);
+              },
+              onSubmitted: (val) {
+                _debounceTimer?.cancel();
+                context.read<SearchCubit>().searchMovies(val);
+              },
+              decoration: InputDecoration(
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: AppColors.gold,
+                  size: 24.sp,
+                ),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: Icon(
+                          Icons.close,
+                          color: AppColors.textGrey,
+                          size: 20.sp,
+                        ),
+                        onPressed: () {
+                          _debounceTimer?.cancel();
+                          _searchController.clear();
+                          setState(() {});
+                          context.read<SearchCubit>().clearSearch();
+                        },
+                      )
+                    : null,
+                hintText: 'Search movies...',
+                hintStyle: TextStyle(
+                  color: AppColors.textGrey,
+                  fontSize: 16.sp,
+                ),
+                fillColor: AppColors.inputFill,
+                filled: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                  borderSide: BorderSide(
+                    color: AppColors.gold.withValues(alpha: 0.1),
                   ),
                 ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                  borderSide: const BorderSide(color: AppColors.gold),
+                ),
               ),
-              SizedBox(height: 16.h),
-              Expanded(
-                child: BlocBuilder<SearchCubit, SearchState>(
-                  builder: (context, state) {
-                    if (state is SearchLoadingState) {
-                      return const Center(
-                        child: CircularProgressIndicator(color: AppColors.gold),
-                      );
-                    }
+            ),
+            SizedBox(height: 16.h),
+            Expanded(
+              child: BlocBuilder<SearchCubit, SearchState>(
+                builder: (context, state) {
+                  if (state is SearchLoadingState) {
+                    return const Center(
+                      child: CircularProgressIndicator(color: AppColors.gold),
+                    );
+                  }
 
-                    if (state is SearchErrorState) {
+                  if (state is SearchErrorState) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            color: Colors.redAccent,
+                            size: 48.sp,
+                          ),
+                          SizedBox(height: 12.h),
+                          Text(
+                            state.errorMessage,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: AppColors.textGrey,
+                              fontSize: 15.sp,
+                            ),
+                          ),
+                          SizedBox(height: 16.h),
+                          ElevatedButton(
+                            onPressed: () => context
+                                .read<SearchCubit>()
+                                .searchMovies(_searchController.text),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.gold,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                            ),
+                            child: Text(
+                              'Retry',
+                              style: TextStyle(
+                                color: AppColors.background,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (state is SearchSuccessState) {
+                    if (state.movies.isEmpty) {
                       return Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.error_outline,
-                                color: Colors.redAccent, size: 48.sp),
+                            Icon(
+                              Icons.movie_filter_outlined,
+                              color: AppColors.textGrey,
+                              size: 60.sp,
+                            ),
                             SizedBox(height: 12.h),
                             Text(
-                              state.errorMessage,
-                              textAlign: TextAlign.center,
+                              'No movies found',
                               style: TextStyle(
-                                  color: AppColors.textGrey, fontSize: 15.sp),
-                            ),
-                            SizedBox(height: 16.h),
-                            ElevatedButton(
-                              onPressed: () => context
-                                  .read<SearchCubit>()
-                                  .searchMovies(_searchController.text),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.gold,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.r)),
+                                color: AppColors.white,
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.bold,
                               ),
-                              child: Text('Retry',
-                                  style: TextStyle(
-                                      color: AppColors.background,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14.sp)),
+                            ),
+                            SizedBox(height: 6.h),
+                            Text(
+                              'Try searching with another keyword',
+                              style: TextStyle(
+                                color: AppColors.textGrey,
+                                fontSize: 14.sp,
+                              ),
                             ),
                           ],
                         ),
                       );
                     }
 
-                    if (state is SearchSuccessState) {
-                      if (state.movies.isEmpty) {
-                        return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.movie_filter_outlined,
-                                  color: AppColors.textGrey, size: 60.sp),
-                              SizedBox(height: 12.h),
-                              Text(
-                                'No movies found',
-                                style: TextStyle(
-                                    color: AppColors.white,
-                                    fontSize: 18.sp,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 6.h),
-                              Text(
-                                'Try searching with another keyword',
-                                style: TextStyle(
-                                    color: AppColors.textGrey, fontSize: 14.sp),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-
-                      return GridView.builder(
-                        physics: const BouncingScrollPhysics(),
-                        gridDelegate:
-                            SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 14.w,
-                          mainAxisSpacing: 14.h,
-                          childAspectRatio: 0.7,
-                        ),
-                        itemCount: state.movies.length,
-                        itemBuilder: (context, index) {
-                          final movie = state.movies[index];
-                          return MoviePosterCard(
-                            imagePath: movie.image,
-                            rating: movie.rating > 0
-                                ? movie.rating.toStringAsFixed(1)
-                                : '7.7',
-                            onTap: () {
-                              Navigator.pushNamed(
-                                context,
-                                RouteName.movieDatailsScreen,
-                                arguments: movie.toMovieEntity(),
-                              );
-                            },
-                          );
-                        },
-                      );
-                    }
-
-                    // SearchInitialState
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/search_icn.png',
-                            width: 140.w,
-                            errorBuilder: (context, error, stackTrace) => Icon(
-                              Icons.search,
-                              size: 100.sp,
-                              color: AppColors.gold.withValues(alpha: 0.5),
-                            ),
-                          ),
-                        ],
+                    return GridView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 14.w,
+                        mainAxisSpacing: 14.h,
+                        childAspectRatio: 0.7,
                       ),
+                      itemCount: state.movies.length,
+                      itemBuilder: (context, index) {
+                        final movie = state.movies[index];
+                        return MoviePosterCard(
+                          imagePath: movie.image,
+                          rating: movie.rating > 0
+                              ? movie.rating.toStringAsFixed(1)
+                              : '7.7',
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              RouteName.movieDatailsScreen,
+                              arguments: movie.toMovieEntity(),
+                            );
+                          },
+                        );
+                      },
                     );
-                  },
-                ),
+                  }
+
+                  // SearchInitialState
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/images/search_icn.png',
+                          width: 140.w,
+                          errorBuilder: (context, error, stackTrace) => Icon(
+                            Icons.search,
+                            size: 100.sp,
+                            color: AppColors.gold.withValues(alpha: 0.5),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: widget.showBottomNav
