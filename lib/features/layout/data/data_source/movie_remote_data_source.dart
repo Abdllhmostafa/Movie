@@ -15,6 +15,8 @@ abstract class MovieRemoteDataSource {
 }
 
 class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
+  static List<Movies>? _cachedMovies;
+
   @override
   Future<List<Movies>> getMovies() async {
     try {
@@ -27,16 +29,37 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
             ? jsonDecode(response.data as String) as Map<String, dynamic>
             : (response.data as Map<String, dynamic>);
         final movieModel = MovieModel.fromJson(data);
-        return movieModel.data?.movies ?? [];
+        final list = movieModel.data?.movies ?? [];
+        if (list.isNotEmpty) {
+          _cachedMovies = list;
+        }
+        return list;
       } else {
+        if (_cachedMovies != null && _cachedMovies!.isNotEmpty) {
+          return _cachedMovies!;
+        }
         throw Exception('Failed to load movies (${response.statusCode})');
       }
     } on DioException catch (e) {
+      if (_cachedMovies != null && _cachedMovies!.isNotEmpty) {
+        return _cachedMovies!;
+      }
       final message = e.response?.data is Map
           ? (e.response?.data['status_message']?.toString())
           : null;
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.sendTimeout ||
+          e.type == DioExceptionType.connectionError) {
+        throw Exception(
+          'Connection timed out. Please check your internet connection and try again.',
+        );
+      }
       throw Exception(message ?? e.message ?? 'Network Error');
     } catch (e) {
+      if (_cachedMovies != null && _cachedMovies!.isNotEmpty) {
+        return _cachedMovies!;
+      }
       throw Exception(e.toString().replaceFirst('Exception: ', ''));
     }
   }
@@ -63,6 +86,14 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
       final message = e.response?.data is Map
           ? (e.response?.data['status_message']?.toString())
           : null;
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.sendTimeout ||
+          e.type == DioExceptionType.connectionError) {
+        throw Exception(
+          'Connection timed out. Please check your internet connection and try again.',
+        );
+      }
       throw Exception(message ?? e.message ?? 'Network Error');
     } catch (e) {
       throw Exception(e.toString().replaceFirst('Exception: ', ''));
@@ -160,6 +191,14 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
       final message = e.response?.data is Map
           ? (e.response?.data['status_message']?.toString())
           : null;
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.sendTimeout ||
+          e.type == DioExceptionType.connectionError) {
+        throw Exception(
+          'Connection timed out. Please check your internet connection and try again.',
+        );
+      }
       throw Exception(message ?? e.message ?? 'Network Error');
     } catch (e) {
       throw Exception(e.toString().replaceFirst('Exception: ', ''));
