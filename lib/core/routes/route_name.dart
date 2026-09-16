@@ -4,6 +4,7 @@ class RouteName {
   static const onBoarding = 'onBoarding';
   static const login = 'login';
   static const register = 'register';
+  static const forgotPassword = 'forgotPassword';
   static const layout = 'layout';
   static const profile = 'profile';
   static const updateProfileScreen = 'updateProfileScreen';

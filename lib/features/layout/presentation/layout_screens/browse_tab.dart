@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:movie_app/core/localization/app_localizations.dart';
 import 'package:movie_app/core/routes/route_name.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 import 'package:movie_app/features/layout/data/data_source/movie_remote_data_source.dart';
@@ -25,6 +26,7 @@ class BrowseTab extends StatelessWidget {
           ..fetchMovies();
       },
       child: const BrowseTabContent(),
+
     );
   }
 }
@@ -60,7 +62,7 @@ class BrowseTabContent extends StatelessWidget {
                       ),
                       SizedBox(height: 12.h),
                       Text(
-                        state.errorMessage,
+                        context.trError(state.errorMessage),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: AppColors.textGrey,
@@ -79,7 +81,7 @@ class BrowseTabContent extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          'Retry',
+                          context.tr('retry'),
                           style: TextStyle(
                             color: AppColors.background,
                             fontWeight: FontWeight.bold,
@@ -96,7 +98,6 @@ class BrowseTabContent extends StatelessWidget {
             if (state is MovieSuccessState) {
               final List<MovieEntity> movies = state.movies;
 
-              // Loop through the movie list and get all genres into a Set to remove duplicates
               final Set<String> genresSet = <String>{};
               for (final movie in movies) {
                 for (final genre in movie.genres) {
@@ -129,14 +130,14 @@ class BrowseTabContent extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Horizontal TabBar with category tabs from Set
+
                       SizedBox(
                         height: 42.h,
                         child: TabBar(
                           isScrollable: true,
                           tabAlignment: TabAlignment.start,
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          labelPadding: EdgeInsets.only(right: 8.w),
+                          labelPadding: EdgeInsets.symmetric(horizontal: 4.w),
                           indicator: BoxDecoration(
                             color: AppColors.primary,
                             borderRadius: BorderRadius.circular(12.r),
@@ -167,7 +168,7 @@ class BrowseTabContent extends StatelessWidget {
                                     width: 1.5,
                                   ),
                                 ),
-                                child: Text(genre),
+                                child: Text(context.trGenre(genre)),
                               ),
                             );
                           }).toList(),
@@ -175,7 +176,6 @@ class BrowseTabContent extends StatelessWidget {
                       ),
                       SizedBox(height: 16.h),
 
-                      // TabBarView showing movies filtered for each genre tab
                       Expanded(
                         child: TabBarView(
                           children: genres.map((genre) {
@@ -199,7 +199,7 @@ class BrowseTabContent extends StatelessWidget {
                                     ),
                                     SizedBox(height: 12.h),
                                     Text(
-                                      'No movies found for $genre',
+                                      '${context.tr('no_movies_for_genre')} ${context.trGenre(genre)}',
                                       style: TextStyle(
                                         color: AppColors.textGrey,
                                         fontSize: 16.sp,

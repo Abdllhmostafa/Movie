@@ -93,7 +93,6 @@ class UserMoviesService {
         if (largeImage.isNotEmpty) 'largeImage': largeImage,
       });
 
-      // Keep max 50 recent history entries
       if (currentList.length > 50) {
         currentList.removeRange(50, currentList.length);
       }

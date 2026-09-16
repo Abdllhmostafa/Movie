@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:movie_app/core/localization/app_localizations.dart';
 import 'package:movie_app/core/routes/route_name.dart';
+import 'package:movie_app/core/services/translation_service.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 import 'package:movie_app/features/layout/data/data_source/movie_remote_data_source.dart';
 import 'package:movie_app/features/layout/data/repo/repo_imp.dart';
@@ -26,6 +28,8 @@ class MovieDetails extends StatefulWidget {
 class _MovieDetailsState extends State<MovieDetails> {
   bool _isWatchlisted = false;
   bool _isWishlisted = false;
+  String? _translatedTitle;
+  String? _translatedSummary;
   List<MovieEntity> _similarMoviesList = [];
   List<String> _screenshotsList = [];
   List<CastEntity> _castList = [];
@@ -97,6 +101,27 @@ class _MovieDetailsState extends State<MovieDetails> {
 
   Future<void> _fetchMovieDetailsExtra() async {
     final movie = _extractMovie(ModalRoute.of(context)?.settings.arguments);
+
+    if (context.loc.isArabic) {
+      _translatedTitle =
+          TranslationService.instance.getCached(movie.title) ?? movie.title;
+      _translatedSummary =
+          TranslationService.instance.getCached(movie.summary) ?? movie.summary;
+
+      TranslationService.instance.translateToAr(movie.title).then((val) {
+        if (mounted && val != _translatedTitle) {
+          setState(() => _translatedTitle = val);
+        }
+      });
+
+      if (movie.summary.isNotEmpty) {
+        TranslationService.instance.translateToAr(movie.summary).then((val) {
+          if (mounted && val != _translatedSummary) {
+            setState(() => _translatedSummary = val);
+          }
+        });
+      }
+    }
 
     UserMoviesService.isWatchlisted(movie.id, title: movie.title).then((isWatch) {
       if (mounted) {
@@ -211,7 +236,7 @@ class _MovieDetailsState extends State<MovieDetails> {
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
-          // Background Poster Backdrop
+
           Column(
             children: [
               SizedBox(
@@ -270,7 +295,6 @@ class _MovieDetailsState extends State<MovieDetails> {
             ],
           ),
 
-          // Scrollable Content
           SingleChildScrollView(
             child: SafeArea(
               child: Padding(
@@ -278,14 +302,24 @@ class _MovieDetailsState extends State<MovieDetails> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header (Back, Watchlist Bookmark, Play, Title, Year, Watch Button)
+
                     MovieDetailsHeader(
-                      title: movie.title,
+                      title: (context.loc.isArabic && _translatedTitle != null)
+                          ? _translatedTitle!
+                          : movie.title,
                       year: movie.year > 0 ? movie.year.toString() : '2024',
                       isFavorite: _isWatchlisted,
                       onBack: () => Navigator.of(context).pop(),
                       onFavorite: () async {
                         final messenger = ScaffoldMessenger.of(context);
+                        final addedMsg = context.tr(
+                          'added_to_watchlist',
+                          {'title': movie.title},
+                        );
+                        final removedMsg = context.tr(
+                          'removed_from_watchlist',
+                          {'title': movie.title},
+                        );
                         final isWatch = await UserMoviesService.toggleWatchlist(
                           id: movie.id,
                           title: movie.title,
@@ -304,11 +338,7 @@ class _MovieDetailsState extends State<MovieDetails> {
                         messenger.hideCurrentSnackBar();
                         messenger.showSnackBar(
                           SnackBar(
-                            content: Text(
-                              isWatch
-                                  ? 'Added "${movie.title}" to Watch List'
-                                  : 'Removed "${movie.title}" from Watch List',
-                            ),
+                            content: Text(isWatch ? addedMsg : removedMsg),
                             duration: const Duration(seconds: 2),
                             backgroundColor: isWatch
                                 ? AppColors.success
@@ -331,7 +361,9 @@ class _MovieDetailsState extends State<MovieDetails> {
                         ScaffoldMessenger.of(context).hideCurrentSnackBar();
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Playing "${movie.title}"...'),
+                            content: Text(
+                              context.tr('playing_movie', {'title': movie.title}),
+                            ),
                             backgroundColor: AppColors.gold,
                           ),
                         );
@@ -351,7 +383,9 @@ class _MovieDetailsState extends State<MovieDetails> {
                         ScaffoldMessenger.of(context).hideCurrentSnackBar();
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Watching "${movie.title}"...'),
+                            content: Text(
+                              context.tr('watching_movie', {'title': movie.title}),
+                            ),
                             backgroundColor: AppColors.gold,
                           ),
                         );
@@ -360,7 +394,6 @@ class _MovieDetailsState extends State<MovieDetails> {
 
                     SizedBox(height: 20.h),
 
-                    // Stats Row (Likes / Wish List, Duration, Rating)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -370,6 +403,14 @@ class _MovieDetailsState extends State<MovieDetails> {
                           label: '${15 + (_isWishlisted ? 1 : 0)}',
                           onTap: () async {
                             final messenger = ScaffoldMessenger.of(context);
+                            final addedMsg = context.tr(
+                              'added_to_wishlist',
+                              {'title': movie.title},
+                            );
+                            final removedMsg = context.tr(
+                              'removed_from_wishlist',
+                              {'title': movie.title},
+                            );
                             final isWish = await UserMoviesService.toggleWishlist(
                               id: movie.id,
                               title: movie.title,
@@ -388,11 +429,7 @@ class _MovieDetailsState extends State<MovieDetails> {
                             messenger.hideCurrentSnackBar();
                             messenger.showSnackBar(
                               SnackBar(
-                                content: Text(
-                                  isWish
-                                      ? 'Added "${movie.title}" to Wish List'
-                                      : 'Removed "${movie.title}" from Wish List',
-                                ),
+                                content: Text(isWish ? addedMsg : removedMsg),
                                 duration: const Duration(seconds: 2),
                                 backgroundColor: isWish
                                     ? AppColors.success
@@ -416,7 +453,6 @@ class _MovieDetailsState extends State<MovieDetails> {
 
                     SizedBox(height: 24.h),
 
-                    // Screenshots Section
                     if (_isLoadingExtra)
                       const Center(
                         child: Padding(
@@ -434,9 +470,8 @@ class _MovieDetailsState extends State<MovieDetails> {
 
                     SizedBox(height: 24.h),
 
-                    // Similar Movies Section
                     Text(
-                      'Similar',
+                      context.tr('similar'),
                       style: TextStyle(
                         color: AppColors.white,
                         fontSize: 22.sp,
@@ -502,9 +537,8 @@ class _MovieDetailsState extends State<MovieDetails> {
 
                     SizedBox(height: 24.h),
 
-                    // Summary Section
                     Text(
-                      'Summary',
+                      context.tr('summary'),
                       style: TextStyle(
                         color: AppColors.white,
                         fontSize: 22.sp,
@@ -513,9 +547,13 @@ class _MovieDetailsState extends State<MovieDetails> {
                     ),
                     SizedBox(height: 8.h),
                     Text(
-                      movie.summary.isNotEmpty
-                          ? movie.summary
-                          : 'No detailed summary is currently available for this title.',
+                      (context.loc.isArabic &&
+                              _translatedSummary != null &&
+                              _translatedSummary!.isNotEmpty)
+                          ? _translatedSummary!
+                          : (movie.summary.isNotEmpty
+                              ? movie.summary
+                              : context.tr('no_summary_available')),
                       style: TextStyle(
                         color: AppColors.textGrey,
                         fontSize: 15.sp,
@@ -525,9 +563,8 @@ class _MovieDetailsState extends State<MovieDetails> {
 
                     SizedBox(height: 24.h),
 
-                    // Cast Section
                     Text(
-                      'Cast',
+                      context.tr('cast'),
                       style: TextStyle(
                         color: AppColors.white,
                         fontSize: 22.sp,
@@ -572,9 +609,8 @@ class _MovieDetailsState extends State<MovieDetails> {
 
                     SizedBox(height: 24.h),
 
-                    // Genres Section
                     Text(
-                      'Genres',
+                      context.tr('genres'),
                       style: TextStyle(
                         color: AppColors.white,
                         fontSize: 22.sp,
@@ -590,7 +626,7 @@ class _MovieDetailsState extends State<MovieDetails> {
                           : (movie.genres.isNotEmpty
                           ? movie.genres
                           : _genres))
-                          .map((genre) => GenreChip(label: genre))
+                          .map((genre) => GenreChip(label: context.trGenre(genre)))
                           .toList(),
                     ),
 

@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
 import 'package:movie_app/core/constants/app_assets.dart';
+import 'package:movie_app/core/localization/app_localizations.dart';
 import 'package:movie_app/core/routes/route_name.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 import 'package:movie_app/features/layout/presentation/profile/manager/profile_cubit.dart';
@@ -40,20 +41,20 @@ class _ProfileScreenBody extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.r),
         ),
-        title: const Text(
-          "Exit App",
-          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+        title: Text(
+          context.tr("exit_app"),
+          style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
         ),
-        content: const Text(
-          "Are you sure you want to log out of your account?",
-          style: TextStyle(color: AppColors.textGrey),
+        content: Text(
+          context.tr("exit_confirm_msg"),
+          style: const TextStyle(color: AppColors.textGrey),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text(
-              "Cancel",
-              style: TextStyle(color: AppColors.white),
+            child: Text(
+              context.tr("cancel"),
+              style: const TextStyle(color: AppColors.white),
             ),
           ),
           ElevatedButton(
@@ -64,7 +65,7 @@ class _ProfileScreenBody extends StatelessWidget {
               Navigator.pop(dialogCtx);
               context.read<ProfileCubit>().signOut();
             },
-            child: const Text("Exit", style: TextStyle(color: AppColors.white)),
+            child: Text(context.tr("exit"), style: const TextStyle(color: AppColors.white)),
           ),
         ],
       ),
@@ -86,7 +87,7 @@ class _ProfileScreenBody extends StatelessWidget {
         } else if (state is ProfileErrorState) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.errorMessage),
+              content: Text(context.trError(state.errorMessage)),
               backgroundColor: AppColors.error,
             ),
           );
@@ -129,44 +130,44 @@ class _ProfileScreenBody extends StatelessWidget {
                     child: Column(
                       children: [
                         Padding(
-                          padding: EdgeInsets.only(
-                            top: 40.h,
-                            bottom: 23.h,
-                            left: 24.w,
-                            right: 26.w,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.w,
+                            vertical: 24.h,
                           ),
                           child: Row(
-                            spacing: 16.w,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Expanded(
+                                flex: 3,
                                 child: Column(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     ClipOval(
                                       child: avatar.startsWith('http')
                                           ? Image.network(
                                               avatar,
-                                              width: 118.w,
-                                              height: 118.h,
+                                              width: 110.w,
+                                              height: 110.h,
                                               fit: BoxFit.cover,
                                               errorBuilder: (context, error,
                                                       stackTrace) =>
                                                   Image.asset(
                                                 AppAssets.gamer9,
-                                                width: 118.w,
-                                                height: 118.h,
+                                                width: 110.w,
+                                                height: 110.h,
                                                 fit: BoxFit.cover,
                                               ),
                                             )
                                           : Image.asset(
                                               avatar,
-                                              width: 118.w,
-                                              height: 118.h,
+                                              width: 110.w,
+                                              height: 110.h,
                                               fit: BoxFit.cover,
                                               errorBuilder: (context, error,
                                                       stackTrace) =>
                                                   Container(
-                                                width: 118.w,
-                                                height: 118.h,
+                                                width: 110.w,
+                                                height: 110.h,
                                                 color: AppColors.cardBackground,
                                                 child: Icon(
                                                   Icons.person,
@@ -176,59 +177,78 @@ class _ProfileScreenBody extends StatelessWidget {
                                               ),
                                             ),
                                     ),
-                                    SizedBox(height: 14.h),
+                                    SizedBox(height: 10.h),
                                     Text(
                                       name,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: AppColors.white,
-                                        fontSize: 20.sp,
+                                        fontSize: 18.sp,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              Column(
-                                children: [
-                                  Text(
-                                    "${wishlistMovies.length}",
-                                    style: TextStyle(
-                                      color: AppColors.white,
-                                      fontSize: 34.sp,
-                                      fontWeight: FontWeight.w700,
+                              SizedBox(width: 8.w),
+                              Expanded(
+                                flex: 2,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "${wishlistMovies.length}",
+                                      style: TextStyle(
+                                        color: AppColors.white,
+                                        fontSize: 30.sp,
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(height: 14.h),
-                                  Text(
-                                    "Wish List",
-                                    style: TextStyle(
-                                      color: AppColors.white,
-                                      fontSize: 22.sp,
-                                      fontWeight: FontWeight.w700,
+                                    SizedBox(height: 8.h),
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        context.tr("wish_list"),
+                                        style: TextStyle(
+                                          color: AppColors.white,
+                                          fontSize: 18.sp,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                              Column(
-                                children: [
-                                  Text(
-                                    "${historyMovies.length}",
-                                    style: TextStyle(
-                                      color: AppColors.white,
-                                      fontSize: 34.sp,
-                                      fontWeight: FontWeight.w700,
+                              SizedBox(width: 8.w),
+                              Expanded(
+                                flex: 2,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "${historyMovies.length}",
+                                      style: TextStyle(
+                                        color: AppColors.white,
+                                        fontSize: 30.sp,
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(height: 14.h),
-                                  Text(
-                                    "History",
-                                    style: TextStyle(
-                                      color: AppColors.white,
-                                      fontSize: 22.sp,
-                                      fontWeight: FontWeight.w700,
+                                    SizedBox(height: 8.h),
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        context.tr("history"),
+                                        style: TextStyle(
+                                          color: AppColors.white,
+                                          fontSize: 18.sp,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -239,7 +259,7 @@ class _ProfileScreenBody extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: ProfileButton(
-                                  text: "Edit Profile",
+                                  text: context.tr("edit_profile"),
                                   backgroundColor: AppColors.gold,
                                   textColor: AppColors.background,
                                   onPressed: () async {
@@ -261,12 +281,15 @@ class _ProfileScreenBody extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(width: 16.w),
-                              ProfileButton(
-                                text: "Exit",
-                                backgroundColor: AppColors.btnBgColor,
-                                textColor: AppColors.white,
-                                icon: Icons.logout,
-                                onPressed: () => _showSignOutDialog(context),
+                              SizedBox(
+                                width: 130.w,
+                                child: ProfileButton(
+                                  text: context.tr("exit"),
+                                  backgroundColor: AppColors.btnBgColor,
+                                  textColor: AppColors.white,
+                                  icon: Icons.logout,
+                                  onPressed: () => _showSignOutDialog(context),
+                                ),
                               ),
                             ],
                           ),
@@ -305,7 +328,7 @@ class _ProfileScreenBody extends StatelessWidget {
                                   ),
                                   SizedBox(height: 6.h),
                                   Text(
-                                    "Watch List",
+                                    context.tr("watch_list"),
                                     style: TextStyle(
                                       color: AppColors.white,
                                       fontSize: 18.sp,
@@ -327,7 +350,7 @@ class _ProfileScreenBody extends StatelessWidget {
                                   ),
                                   SizedBox(height: 6.h),
                                   Text(
-                                    "History",
+                                    context.tr("history"),
                                     style: TextStyle(
                                       color: AppColors.white,
                                       fontSize: 18.sp,
@@ -358,7 +381,7 @@ class _ProfileScreenBody extends StatelessWidget {
                                 ),
                                 SizedBox(height: 12.h),
                                 Text(
-                                  "No movies in your watch list yet",
+                                  context.tr("no_watchlist_movies"),
                                   style: TextStyle(
                                     color: AppColors.textGrey,
                                     fontSize: 16.sp,
@@ -433,7 +456,7 @@ class _ProfileScreenBody extends StatelessWidget {
                                 ),
                                 SizedBox(height: 12.h),
                                 Text(
-                                  "No watch history yet",
+                                  context.tr("no_history_movies"),
                                   style: TextStyle(
                                     color: AppColors.textGrey,
                                     fontSize: 16.sp,

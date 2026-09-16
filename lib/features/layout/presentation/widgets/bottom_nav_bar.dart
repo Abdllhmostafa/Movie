@@ -11,7 +11,7 @@ class BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60.h, // Control the exact height you want
+      height: 60.h,
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(24.r),
@@ -38,7 +38,7 @@ class BottomNavBar extends StatelessWidget {
             index: 3,
             icon: Icons.person_outline,
             activeIcon: Icons.person,
-            size: 24, // custom size for profile if needed
+            size: 24,
           ),
         ],
       ),

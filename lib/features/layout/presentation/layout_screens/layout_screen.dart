@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
+import 'package:movie_app/core/localization/language_cubit.dart';
+import 'package:movie_app/core/localization/language_state.dart';
 import 'package:movie_app/features/layout/presentation/layout_screens/browse_tab.dart';
 import 'package:movie_app/features/layout/presentation/layout_screens/home_screen.dart';
 import 'package:movie_app/features/layout/presentation/profile/manager/profile_cubit.dart';
@@ -20,13 +22,6 @@ class _LayoutScreenState extends State<LayoutScreen> {
   int _selectedIndex = 0;
   late final ProfileCubit _profileCubit;
 
-  final List<Widget> _screens = const [
-    HomeScreen(),
-    SearchTab(),
-    BrowseTab(),
-    ProfileScreen(),
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -43,36 +38,48 @@ class _LayoutScreenState extends State<LayoutScreen> {
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _profileCubit,
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        // Using Stack inside the body to let screens pass behind the floating navbar
-        body: Stack(
-          children: [
-            // 1. Your tab screens fill the whole screen space
-            Positioned.fill(
-              child: IndexedStack(index: _selectedIndex, children: _screens),
-            ),
+      child: BlocBuilder<LanguageCubit, LanguageState>(
+        builder: (context, langState) {
+          final screens = [
+            HomeScreen(key: ValueKey('home_${langState.locale.languageCode}')),
+            SearchTab(key: ValueKey('search_${langState.locale.languageCode}')),
+            BrowseTab(key: ValueKey('browse_${langState.locale.languageCode}')),
+            ProfileScreen(key: ValueKey('profile_${langState.locale.languageCode}')),
+          ];
 
-            // 2. Floating Custom Bottom NavBar anchored at the bottom
-            Positioned(
-              left: 16.w,
-              right: 16.w,
-              bottom: 16.h,
+          return Scaffold(
+            backgroundColor: AppColors.background,
 
-              child: BottomNavBar(
-                currentIndex: _selectedIndex,
-                onTap: (index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                  if (index == 3) {
-                    _profileCubit.getProfileData();
-                  }
-                },
-              ),
+            body: Stack(
+              children: [
+
+                Positioned.fill(
+                  child: IndexedStack(
+                    index: _selectedIndex,
+                    children: screens,
+                  ),
+                ),
+
+                Positioned(
+                  left: 16.w,
+                  right: 16.w,
+                  bottom: 16.h,
+                  child: BottomNavBar(
+                    currentIndex: _selectedIndex,
+                    onTap: (index) {
+                      setState(() {
+                        _selectedIndex = index;
+                      });
+                      if (index == 3) {
+                        _profileCubit.getProfileData();
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

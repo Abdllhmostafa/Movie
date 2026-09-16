@@ -1,6 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:movie_app/core/localization/app_localizations.dart';
+import 'package:movie_app/core/localization/language_cubit.dart';
+import 'package:movie_app/core/localization/language_state.dart';
 import 'package:movie_app/core/routes/route_name.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 import 'package:movie_app/features/layout/data/data_source/movie_remote_data_source.dart';
@@ -43,9 +47,6 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
 
   @override
   Widget build(BuildContext context) {
-    final double width = MediaQuery.of(context).size.width;
-    final double height = MediaQuery.of(context).size.height;
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: BlocBuilder<MovieCubit, MovieState>(
@@ -64,10 +65,10 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: AppColors.white),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
                   ElevatedButton(
                     onPressed: () => context.read<MovieCubit>().fetchMovies(),
-                    child: const Text('Retry'),
+                    child: Text(context.tr('retry')),
                   ),
                 ],
               ),
@@ -76,10 +77,10 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
             final movies = state.movies;
 
             if (movies.isEmpty) {
-              return const Center(
+              return Center(
                 child: Text(
-                  'No movies available',
-                  style: TextStyle(color: AppColors.white),
+                  context.tr('no_movies_available'),
+                  style: const TextStyle(color: AppColors.white),
                 ),
               );
             }
@@ -89,22 +90,19 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
 
             return Stack(
               children: [
-                // Top Backdrop with smooth gradient
+
                 _HomeBackdrop(
-                  height: height * 0.69,
+                  height: 640.h,
                   imageUrl: currentMovie.image,
                 ),
 
-                // Foreground Scrollable Content
                 SingleChildScrollView(
                   child: SafeArea(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Header Banners & Carousel Slider
+
                         _HomeCarousel(
-                          width: width,
-                          height: height,
                           movies: movies,
                           initialIndex: currentIndex,
                           onPageChanged: (index) {
@@ -114,26 +112,20 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                           },
                         ),
 
-                        SizedBox(height: height * 0.03),
+                        SizedBox(height: 24.h),
 
-                        // Section Header: Action Movies
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: width * 0.04,
-                          ),
-                          child: const _HomeSectionHeader(title: 'Action'),
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          child: _HomeSectionHeader(title: context.tr('action')),
                         ),
 
-                        SizedBox(height: height * 0.01),
+                        SizedBox(height: 10.h),
 
-                        // Horizontal Movie Posters List
                         _HomeHorizontalMovieList(
-                          width: width,
-                          height: height * 0.28,
                           movies: movies,
                         ),
 
-                        SizedBox(height: height * 0.02),
+                        SizedBox(height: 20.h),
                       ],
                     ),
                   ),
@@ -148,7 +140,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
       bottomNavigationBar: widget.showBottomNav
           ? SafeArea(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: width * .02),
+                padding: EdgeInsets.symmetric(horizontal: 8.w),
                 child: const BottomNavBar(),
               ),
             )
@@ -212,15 +204,11 @@ class _HomeBackdrop extends StatelessWidget {
 }
 
 class _HomeCarousel extends StatelessWidget {
-  final double width;
-  final double height;
   final List<MovieEntity> movies;
   final int initialIndex;
   final ValueChanged<int> onPageChanged;
 
   const _HomeCarousel({
-    required this.width,
-    required this.height,
     required this.movies,
     required this.initialIndex,
     required this.onPageChanged,
@@ -228,27 +216,88 @@ class _HomeCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Image.asset('assets/images/img_availableNow.png', width: width * .6),
-        SizedBox(height: height * 0.01),
-        CarouselSlider(
-          options: CarouselOptions(
-            height: height * 0.38,
-            initialPage: initialIndex,
-            viewportFraction: 0.5,
-            enlargeCenterPage: true,
-            autoPlay: false,
-            disableCenter: true,
-            animateToClosest: true,
-            onPageChanged: (index, reason) => onPageChanged(index),
-          ),
-          items: movies.map((movie) {
-            return _MoviePoster(movie: movie);
-          }).toList(),
-        ),
-        Image.asset('assets/images/img_watchNow.png', width: width * .8),
-      ],
+    return BlocBuilder<LanguageCubit, LanguageState>(
+      builder: (context, langState) {
+        final isArabic = langState.isArabic ||
+            Localizations.maybeLocaleOf(context)?.languageCode == 'ar' ||
+            context.loc.isArabic;
+
+        return Column(
+          children: [
+            isArabic
+                ? Padding(
+                    padding: EdgeInsets.symmetric(vertical: 4.h),
+                    child: Text(
+                      context.tr('available_now'),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontSize: 34.sp,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.5,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.95),
+                            offset: const Offset(0, 3),
+                            blurRadius: 8,
+                          ),
+                          Shadow(
+                            color: Colors.white.withValues(alpha: 0.35),
+                            offset: const Offset(0, 0),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : Image.asset('assets/images/img_availableNow.png', width: 250.w),
+            SizedBox(height: 10.h),
+            CarouselSlider(
+              options: CarouselOptions(
+                height: 350.h,
+                initialPage: initialIndex,
+                viewportFraction: 0.5,
+                enlargeCenterPage: true,
+                autoPlay: false,
+                disableCenter: true,
+                animateToClosest: true,
+                onPageChanged: (index, reason) => onPageChanged(index),
+              ),
+              items: movies.map((movie) {
+                return _MoviePoster(movie: movie);
+              }).toList(),
+            ),
+            SizedBox(height: 10.h),
+            isArabic
+                ? Padding(
+                    padding: EdgeInsets.symmetric(vertical: 4.h),
+                    child: Text(
+                      context.tr('watch_now'),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontSize: 42.sp,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 2.0,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.95),
+                            offset: const Offset(0, 3),
+                            blurRadius: 8,
+                          ),
+                          Shadow(
+                            color: Colors.white.withValues(alpha: 0.35),
+                            offset: const Offset(0, 0),
+                            blurRadius: 12,
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : Image.asset('assets/images/img_watchNow.png', width: 340.w),
+          ],
+        );
+      },
     );
   }
 }
@@ -265,17 +314,17 @@ class _HomeSectionHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.white,
-            fontSize: 20,
+            fontSize: 20.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
-        const Text(
-          'See More →',
+        Text(
+          context.tr('see_more'),
           style: TextStyle(
             color: AppColors.primary,
-            fontSize: 16,
+            fontSize: 16.sp,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -285,27 +334,23 @@ class _HomeSectionHeader extends StatelessWidget {
 }
 
 class _HomeHorizontalMovieList extends StatelessWidget {
-  final double width;
-  final double height;
   final List<MovieEntity> movies;
 
   const _HomeHorizontalMovieList({
-    required this.width,
-    required this.height,
     required this.movies,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: height,
+      height: 260.h,
       child: ListView.separated(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.04),
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
         scrollDirection: Axis.horizontal,
         itemCount: movies.length,
-        separatorBuilder: (context, index) => SizedBox(width: width * 0.03),
+        separatorBuilder: (context, index) => SizedBox(width: 12.w),
         itemBuilder: (context, index) {
-          return _MoviePoster(movie: movies[index], width: width * 0.35);
+          return _MoviePoster(movie: movies[index], width: 145.w);
         },
       ),
     );
@@ -329,7 +374,7 @@ class _MoviePoster extends StatelessWidget {
         );
       },
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         child: Stack(
           children: [
             SizedBox(
@@ -345,12 +390,12 @@ class _MoviePoster extends StatelessWidget {
               ),
             ),
             Positioned(
-              top: 8,
-              left: 8,
+              top: 8.h,
+              left: 8.w,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(10.r),
                   color: AppColors.background.withValues(alpha: 0.71),
                 ),
                 child: Row(
@@ -358,14 +403,14 @@ class _MoviePoster extends StatelessWidget {
                   children: [
                     Text(
                       movie.rating.toStringAsFixed(1),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.white,
-                        fontSize: 12,
+                        fontSize: 12.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(width: 2),
-                    const Icon(Icons.star, color: AppColors.gold, size: 14),
+                    SizedBox(width: 2.w),
+                    Icon(Icons.star, color: AppColors.gold, size: 14.sp),
                   ],
                 ),
               ),

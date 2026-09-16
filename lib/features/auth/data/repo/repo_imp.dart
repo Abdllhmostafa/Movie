@@ -95,10 +95,7 @@ class AuthRepoImp implements AuthRepo {
     }
   }
 
-
   String _mapFirebaseError(FirebaseAuthException e) {
-    // ignore: avoid_print
-    print('FirebaseAuthException [${e.code}]: ${e.message}');
     switch (e.code) {
       case 'user-not-found':
         return 'No user found for that email.';
