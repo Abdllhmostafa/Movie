@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:movie_app/core/network/dio_sevice.dart';
+import 'package:movie_app/core/services/translation_service.dart';
 import 'package:movie_app/features/layout/data/models/movie_model.dart';
 import 'package:movie_app/features/layout/demain/entitiy/cast_entity.dart';
 import 'package:movie_app/features/layout/demain/entitiy/movie_details_extra_entity.dart';
@@ -120,7 +121,6 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
         final movie = data['data']?['movie'] as Map<String, dynamic>?;
         if (movie == null) return const MovieDetailsExtraEntity();
 
-        // Screenshots
         final List<String> screenshots = [];
         for (int i = 1; i <= 3; i++) {
           final shot =
@@ -131,7 +131,6 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
           }
         }
 
-        // Cast
         final List<CastEntity> castList = [];
         if (movie['cast'] != null && movie['cast'] is List) {
           for (final c in movie['cast']) {
@@ -147,7 +146,6 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
           }
         }
 
-        // Genres
         final List<String> genresList = [];
         if (movie['genres'] != null && movie['genres'] is List) {
           for (final g in movie['genres']) {
@@ -172,10 +170,17 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
   @override
   Future<List<SearchMovies>> getSearchMovies([String query = '']) async {
     try {
+      String effectiveQuery = query.trim();
+      if (effectiveQuery.isNotEmpty &&
+          TranslationService.isArabicText(effectiveQuery)) {
+        effectiveQuery =
+            await TranslationService.instance.translateToEn(effectiveQuery);
+      }
+
       final response = await DioSevice.dio.get(
         'https://movies-api.accel.li/api/v2/list_movies.json',
         queryParameters:
-            query.trim().isNotEmpty ? {'query_term': query.trim()} : null,
+            effectiveQuery.isNotEmpty ? {'query_term': effectiveQuery} : null,
       );
 
       if (response.statusCode == 200) {

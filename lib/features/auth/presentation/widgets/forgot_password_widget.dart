@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:movie_app/core/localization/app_localizations.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 
 class ForgotPasswordWidget extends StatelessWidget {
@@ -14,17 +16,17 @@ class ForgotPasswordWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment.centerRight,
+      alignment: AlignmentDirectional.centerEnd,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(4),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+          padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 2.w),
           child: Text(
-            'Forgot Password?',
+            context.tr('forget_password_q'),
             style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w400,
               color: color,
             ),
           ),

@@ -7,6 +7,7 @@ class ProfileButton extends StatelessWidget {
   final Color textColor;
   final IconData? icon;
   final VoidCallback? onPressed;
+  final double? width;
 
   const ProfileButton({
     super.key,
@@ -15,34 +16,42 @@ class ProfileButton extends StatelessWidget {
     required this.textColor,
     this.icon,
     this.onPressed,
+    this.width,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 56.h,
+      width: width ?? double.infinity,
       child: CupertinoButton(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(16.r),
-        padding: EdgeInsets.symmetric(horizontal: 24.w),
+        padding: EdgeInsets.symmetric(horizontal: 10.w),
         onPressed: onPressed,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              text,
-              style: TextStyle(
-                color: textColor,
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w500,
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ),
             if (icon != null) ...[
-              SizedBox(width: 10.w),
+              SizedBox(width: 8.w),
               Icon(
                 icon,
                 color: textColor,
-                size: 22.sp,
+                size: 20.sp,
               ),
             ],
           ],

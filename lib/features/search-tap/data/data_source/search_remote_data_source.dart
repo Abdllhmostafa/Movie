@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:movie_app/core/network/dio_sevice.dart';
+import 'package:movie_app/core/services/translation_service.dart';
 import 'package:movie_app/features/search-tap/data/models/search_model.dart';
 
 abstract class SearchRemoteDataSource {
@@ -11,9 +12,15 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
   @override
   Future<List<SearchMovies>> searchMovies(String query) async {
     try {
+      String effectiveQuery = query.trim();
+      if (TranslationService.isArabicText(effectiveQuery)) {
+        effectiveQuery =
+            await TranslationService.instance.translateToEn(effectiveQuery);
+      }
+
       final response = await DioSevice.dio.get(
         'https://movies-api.accel.li/api/v2/list_movies.json',
-        queryParameters: {'query_term': query},
+        queryParameters: {'query_term': effectiveQuery},
       );
 
       if (response.statusCode == 200) {

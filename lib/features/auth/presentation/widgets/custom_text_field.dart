@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 
 class CustomTextField extends StatefulWidget {
@@ -69,10 +70,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
           ),
           decoration: InputDecoration(
             hintText: widget.hint,
-            hintStyle: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w300,
-              color: AppColors.hintColor,
+            hintStyle: TextStyle(
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w400,
+              color: Colors.white70,
             ),
             filled: true,
             fillColor: widget.fillColor,
@@ -81,10 +82,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 ? IconButton(
                     icon: Icon(
                       _obscureText
-                          ? Icons.visibility_off_outlined
-                          : Icons.visibility_outlined,
-                      color: AppColors.gold,
-                      size: 22,
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                      color: Colors.white,
+                      size: 24.sp,
                     ),
                     onPressed: () {
                       setState(() {
@@ -93,38 +94,32 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     },
                   )
                 : widget.suffixIcon,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 18,
-              vertical: 18,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 18.w,
+              vertical: 18.h,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(
-                color: AppColors.inputBorder,
-                width: 1,
-              ),
+              borderRadius: BorderRadius.circular(15.r),
+              borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(
-                color: AppColors.inputBorder,
-                width: 1,
-              ),
+              borderRadius: BorderRadius.circular(15.r),
+              borderSide: BorderSide.none,
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(15.r),
               borderSide: const BorderSide(color: AppColors.gold, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(15.r),
               borderSide: const BorderSide(color: AppColors.error, width: 1.5),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(15.r),
               borderSide: const BorderSide(color: AppColors.error, width: 2),
             ),
-            errorStyle: const TextStyle(
-              fontSize: 12,
+            errorStyle: TextStyle(
+              fontSize: 12.sp,
               fontWeight: FontWeight.w500,
               color: AppColors.error,
             ),

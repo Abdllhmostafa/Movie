@@ -3,6 +3,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:movie_app/core/localization/app_localizations.dart';
+import 'package:movie_app/core/localization/language_cubit.dart';
+import 'package:movie_app/core/localization/language_state.dart';
 import 'package:movie_app/core/routes/app_routers.dart';
 import 'package:movie_app/core/routes/route_name.dart';
 import 'package:movie_app/core/theme/app_theme.dart';
@@ -41,13 +45,20 @@ class MyApp extends StatelessWidget {
     final resetPasswordUseCase = ResetPasswordUseCase(authRepo);
     final googleSignInUseCase = GoogleSignInUseCase(authRepo);
 
-    return BlocProvider(
-      create: (context) => AuthCubit(
-        loginUseCase,
-        registerUseCase,
-        resetPasswordUseCase: resetPasswordUseCase,
-        googleSignInUseCase: googleSignInUseCase,
-      ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => AuthCubit(
+            loginUseCase,
+            registerUseCase,
+            resetPasswordUseCase: resetPasswordUseCase,
+            googleSignInUseCase: googleSignInUseCase,
+          ),
+        ),
+        BlocProvider(
+          create: (context) => LanguageCubit(),
+        ),
+      ],
       child: ScreenUtilInit(
         designSize: const Size(430, 932),
         minTextAdapt: true,
@@ -62,12 +73,24 @@ class MyApp extends StatelessWidget {
             }
           }
 
-          return MaterialApp(
-            initialRoute: loggedIn ? RouteName.layout : RouteName.login,
-            onGenerateRoute: appRouters.generateRoute,
-            debugShowCheckedModeBanner: false,
-            title: 'Route Movie App',
-            theme: AppTheme.darkTheme,
+          return BlocBuilder<LanguageCubit, LanguageState>(
+            builder: (context, languageState) {
+              return MaterialApp(
+                locale: languageState.locale,
+                supportedLocales: AppLocalizations.supportedLocales,
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                initialRoute: loggedIn ? RouteName.layout : RouteName.login,
+                onGenerateRoute: appRouters.generateRoute,
+                debugShowCheckedModeBanner: false,
+                title: 'Route Movie App',
+                theme: AppTheme.darkTheme,
+              );
+            },
           );
         },
       ),

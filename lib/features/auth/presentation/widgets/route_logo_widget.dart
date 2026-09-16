@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 
 class RouteLogoWidget extends StatelessWidget {
@@ -19,9 +20,15 @@ class RouteLogoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Image.asset('assets/logos/logo_app.png'));
+    return Center(
+      child: Image.asset(
+        'assets/logos/logo_app.png',
+        width: 120.w,
+        height: 118.h,
+        fit: BoxFit.contain,
+      ),
+    );
   }
 }
 
-// Alias for semantic movie app naming
 typedef MovieLogoWidget = RouteLogoWidget;

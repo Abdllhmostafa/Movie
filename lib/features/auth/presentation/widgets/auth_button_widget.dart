@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 
 class AuthButtonWidget extends StatelessWidget {
@@ -11,6 +12,7 @@ class AuthButtonWidget extends StatelessWidget {
   final double borderRadius;
   final double fontSize;
   final IconData? icon;
+  final Widget? customIcon;
   final double iconSize;
 
   const AuthButtonWidget({
@@ -24,13 +26,14 @@ class AuthButtonWidget extends StatelessWidget {
     this.borderRadius = 15,
     this.fontSize = 18,
     this.icon,
+    this.customIcon,
     this.iconSize = 28,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: height,
+      height: height.h,
       width: double.infinity,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
@@ -38,8 +41,9 @@ class AuthButtonWidget extends StatelessWidget {
           foregroundColor: textColor,
           disabledBackgroundColor: backgroundColor.withValues(alpha: 0.5),
           disabledForegroundColor: textColor.withValues(alpha: 0.5),
+          padding: EdgeInsets.symmetric(horizontal: 12.w),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(borderRadius),
+            borderRadius: BorderRadius.circular(borderRadius.r),
           ),
           elevation: 3,
           shadowColor: backgroundColor.withValues(alpha: 0.3),
@@ -47,8 +51,8 @@ class AuthButtonWidget extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         child: isLoading
             ? SizedBox(
-                width: 24,
-                height: 24,
+                width: 24.w,
+                height: 24.h,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.5,
                   valueColor: AlwaysStoppedAnimation<Color>(textColor),
@@ -58,17 +62,26 @@ class AuthButtonWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (icon != null) ...[
-                    Icon(icon, size: iconSize, color: textColor),
-                    const SizedBox(width: 10),
+                  if (customIcon != null) ...[
+                    customIcon!,
+                    SizedBox(width: 10.w),
+                  ] else if (icon != null) ...[
+                    Icon(icon, size: iconSize.sp, color: textColor),
+                    SizedBox(width: 10.w),
                   ],
-                  Text(
-                    text,
-                    style: TextStyle(
-                      fontSize: fontSize,
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
-                      letterSpacing: 0.5,
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        text,
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: fontSize.sp,
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
                     ),
                   ),
                 ],

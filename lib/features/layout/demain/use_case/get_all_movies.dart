@@ -1,4 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+
 import 'package:movie_app/core/use_case/use_case.dart';
 import 'package:movie_app/core/utils/type_def.dart';
 import 'package:movie_app/features/layout/demain/entitiy/movie_entity.dart';
