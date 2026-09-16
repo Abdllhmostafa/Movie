@@ -28,18 +28,17 @@ class AppLocalizations {
   bool get isArabic => locale.languageCode == 'ar';
   bool get isEnglish => locale.languageCode == 'en';
 
-  static final Map<String, Map<String, String>> _localizedValues = {
-    'en': enTranslations,
-    'ar': arTranslations,
-  };
-
-  static final Map<String, String> _arabicGenres = arGenres;
+  static Map<String, String> _getTranslations(String languageCode) {
+    if (languageCode == 'ar') {
+      return arTranslations;
+    }
+    return enTranslations;
+  }
 
   String translate(String key, [Map<String, String>? args]) {
     final languageCode = locale.languageCode;
-    String text = _localizedValues[languageCode]?[key] ??
-        _localizedValues['en']?[key] ??
-        key;
+    final currentMap = _getTranslations(languageCode);
+    String text = currentMap[key] ?? enTranslations[key] ?? key;
     if (args != null) {
       args.forEach((placeholder, value) {
         text = text.replaceAll('{$placeholder}', value);
@@ -51,7 +50,7 @@ class AppLocalizations {
   String translateGenre(String genre) {
     if (!isArabic) return genre;
     final normalized = genre.trim().toLowerCase();
-    return _arabicGenres[normalized] ?? genre;
+    return arGenres[normalized] ?? genre;
   }
 
   String translateError(String rawError) {

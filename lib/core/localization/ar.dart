@@ -12,6 +12,7 @@ const Map<String, String> arTranslations = {
   'dont_have_account': 'ليس لديك حساب؟',
   'create_one': 'إنشاء حساب جديد',
   'login_with_google': 'تسجيل الدخول بجوجل',
+  'register_with_google': 'التسجيل بواسطة جوجل',
   'welcome_back': 'مرحباً بعودتك',
   'please_enter_email': 'يرجى إدخال البريد الإلكتروني',
   'please_enter_valid_email': 'يرجى إدخال بريد إلكتروني صالح',
