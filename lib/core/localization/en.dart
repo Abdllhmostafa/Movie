@@ -12,6 +12,7 @@ const Map<String, String> enTranslations = {
   'dont_have_account': 'Don’t Have Account ?',
   'create_one': 'Create One',
   'login_with_google': 'Login With Google',
+  'register_with_google': 'Register With Google',
   'welcome_back': 'Welcome back',
   'please_enter_email': 'Please enter your email',
   'please_enter_valid_email': 'Please enter a valid email address',

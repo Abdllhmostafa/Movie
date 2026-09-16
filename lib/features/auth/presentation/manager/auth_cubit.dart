@@ -46,7 +46,7 @@ class AuthCubit extends Cubit<AuthState> {
 
     result.fold(
       (failureMessage) => emit(AuthFailure(failureMessage)),
-      (userEntity) => emit(AuthSuccess(userEntity)),
+      (userEntity) => emit(AuthRegisterSuccess(userEntity)),
     );
   }
 

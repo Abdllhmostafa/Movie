@@ -25,13 +25,16 @@ class AuthPromptRow extends StatelessWidget {
     final effectiveFontSize = fontSize ?? 14.sp;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          questionText,
-          style: TextStyle(
-            fontSize: effectiveFontSize,
-            fontWeight: FontWeight.w400,
-            color: questionColor,
+        Flexible(
+          child: Text(
+            questionText,
+            style: TextStyle(
+              fontSize: effectiveFontSize,
+              fontWeight: FontWeight.w400,
+              color: questionColor,
+            ),
           ),
         ),
         SizedBox(width: 4.w),

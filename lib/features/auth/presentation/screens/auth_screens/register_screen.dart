@@ -1,3 +1,5 @@
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,9 +11,9 @@ import 'package:movie_app/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:movie_app/features/auth/presentation/manager/auth_state.dart';
 import 'package:movie_app/features/auth/presentation/widgets/auth_button_widget.dart';
 import 'package:movie_app/features/auth/presentation/widgets/auth_prompt_row.dart';
+import 'package:movie_app/features/auth/presentation/widgets/google_logo_icon.dart';
 import 'package:movie_app/features/auth/presentation/widgets/language_switch_widget.dart';
 import 'package:movie_app/features/auth/presentation/widgets/register_form_widget.dart';
-import 'package:movie_app/features/layout/presentation/widgets/avatar_picker_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -29,6 +31,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _rePasswordController = TextEditingController();
   final _phoneController = TextEditingController();
   int _currentAvatarIndex = 0;
+  bool _isGoogleAuth = false;
 
   final List<String> _avatars = const [
     AppAssets.gamer1,
@@ -55,6 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _onRegisterPressed(BuildContext context) async {
+    _isGoogleAuth = false;
     FocusScope.of(context).unfocus();
     if (_formKey.currentState?.validate() ?? false) {
       final phone = _phoneController.text.trim();
@@ -81,48 +85,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  void _previousAvatar() {
-    setState(() {
-      _currentAvatarIndex =
-          (_currentAvatarIndex - 1 + _avatars.length) % _avatars.length;
-    });
-  }
-
-  void _nextAvatar() {
-    setState(() {
-      _currentAvatarIndex = (_currentAvatarIndex + 1) % _avatars.length;
-    });
-  }
-
-  void _openAvatarPicker() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (_) => Padding(
-        padding: EdgeInsets.all(16.r),
-        child: AvatarPickerSheet(
-          currentAvatar: _selectedAvatar,
-          onAvatarSelected: (avatar) {
-            final index = _avatars.indexOf(avatar);
-            if (index != -1) {
-              setState(() {
-                _currentAvatarIndex = index;
-              });
-            }
-          },
-        ),
-      ),
-    );
+  void _onGoogleSignIn(BuildContext context) {
+    _isGoogleAuth = true;
+    context.read<AuthCubit>().signInWithGoogle();
   }
 
   @override
   Widget build(BuildContext context) {
-    final prevAvatar =
-        _avatars[(_currentAvatarIndex - 1 + _avatars.length) % _avatars.length];
-    final nextAvatar =
-        _avatars[(_currentAvatarIndex + 1) % _avatars.length];
-
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       behavior: HitTestBehavior.opaque,
@@ -151,6 +120,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           listenWhen: (previous, current) => previous != current,
           listener: (context, state) {
             if (state is AuthSuccess) {
+              if (_isGoogleAuth) {
+                Navigator.pushReplacementNamed(context, RouteName.layout);
+              }
+            } else if (state is AuthRegisterSuccess) {
               final uid = state.user.uID;
               final phone = _phoneController.text.trim();
               final name = _nameController.text.trim();
@@ -161,6 +134,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 }
                 prefs.setString('user_avatar_$uid', _selectedAvatar);
               });
+
+              // Sign out any auto-signed-in firebase session from registration so user must log in
+              try {
+                FirebaseAuth.instance.signOut();
+              } catch (_) {}
+
+              context.read<AuthCubit>().resetState();
+
               final successMsg = context.tr('register_success_msg');
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -170,7 +151,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   backgroundColor: AppColors.success,
                 ),
               );
-              Navigator.pushReplacementNamed(context, RouteName.login);
+
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else {
+                Navigator.pushReplacementNamed(context, RouteName.login);
+              }
             } else if (state is AuthFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -192,70 +178,58 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   children: [
                     SizedBox(height: 8.h),
 
-                    GestureDetector(
-                      onHorizontalDragEnd: (details) {
-                        if (details.primaryVelocity != null) {
-                          if (details.primaryVelocity! < 0) {
-                            _nextAvatar();
-                          } else if (details.primaryVelocity! > 0) {
-                            _previousAvatar();
-                          }
-                        }
-                      },
-                      child: SizedBox(
-                        height: 160.h,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-
-                            GestureDetector(
-                              onTap: _previousAvatar,
-                              child: Opacity(
-                                opacity: 0.7,
-                                child: ClipOval(
-                                  child: Image.asset(
-                                    prevAvatar,
-                                    width: 80.w,
-                                    height: 80.h,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
+                    // Single-row Avatar Carousel Slider
+                    CarouselSlider.builder(
+                      itemCount: _avatars.length,
+                      options: CarouselOptions(
+                        height: 145.h,
+                        initialPage: _currentAvatarIndex,
+                        viewportFraction: 0.36,
+                        enlargeCenterPage: true,
+                        enlargeFactor: 0.32,
+                        enableInfiniteScroll: true,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            _currentAvatarIndex = index;
+                          });
+                        },
+                      ),
+                      itemBuilder: (context, index, realIndex) {
+                        final avatar = _avatars[index];
+                        final isSelected = _currentAvatarIndex == index;
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _currentAvatarIndex = index;
+                            });
+                          },
+                          child: Center(
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              width: isSelected ? 135.w : 85.w,
+                              height: isSelected ? 135.h : 85.h,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: isSelected
+                                    ? Border.all(
+                                        color: AppColors.gold,
+                                        width: 2.5,
+                                      )
+                                    : null,
                               ),
-                            ),
-                            SizedBox(width: 14.w),
-
-                            GestureDetector(
-                              onTap: _openAvatarPicker,
                               child: ClipOval(
                                 child: Image.asset(
-                                  _selectedAvatar,
-                                  width: 135.w,
-                                  height: 135.h,
+                                  avatar,
                                   fit: BoxFit.cover,
                                 ),
                               ),
                             ),
-                            SizedBox(width: 14.w),
-
-                            GestureDetector(
-                              onTap: _nextAvatar,
-                              child: Opacity(
-                                opacity: 0.7,
-                                child: ClipOval(
-                                  child: Image.asset(
-                                    nextAvatar,
-                                    width: 80.w,
-                                    height: 80.h,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        );
+                      },
                     ),
+
+                    SizedBox(height: 6.h),
                     Center(
                       child: Text(
                         context.tr('avatar'),
@@ -267,6 +241,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     SizedBox(height: 20.h),
+
                     RegisterFormWidget(
                       formKey: _formKey,
                       nameController: _nameController,
@@ -277,19 +252,63 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       onSubmitted: () => _onRegisterPressed(context),
                     ),
                     SizedBox(height: 24.h),
+
                     AuthButtonWidget(
                       text: context.tr('create_account'),
                       fontSize: 20.sp,
-                      isLoading: isLoading,
+                      isLoading: isLoading && !_isGoogleAuth,
                       onPressed: () => _onRegisterPressed(context),
                     ),
                     SizedBox(height: 16.h),
+
                     AuthPromptRow(
                       questionText: context.tr('already_have_account'),
                       actionText: context.tr('login'),
                       onTap: () => Navigator.of(context).maybePop(),
                     ),
                     SizedBox(height: 20.h),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            indent: 30.w,
+                            color: AppColors.gold,
+                            thickness: 1.2,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 14.w),
+                          child: Text(
+                            context.tr('or'),
+                            style: TextStyle(
+                              color: AppColors.gold,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Divider(
+                            endIndent: 30.w,
+                            color: AppColors.gold,
+                            thickness: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16.h),
+
+                    AuthButtonWidget(
+                      customIcon: const GoogleLogoIcon(size: 24),
+                      text: context.tr('register_with_google'),
+                      fontSize: 18.sp,
+                      isLoading: isLoading && _isGoogleAuth,
+                      onPressed: () => _onGoogleSignIn(context),
+                    ),
+                    SizedBox(height: 20.h),
+
                     const LanguageSwitchWidget(),
                     SizedBox(height: 16.h),
                   ],

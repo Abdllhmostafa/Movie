@@ -90,18 +90,13 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
 
             return Stack(
               children: [
-
-                _HomeBackdrop(
-                  height: 640.h,
-                  imageUrl: currentMovie.image,
-                ),
+                _HomeBackdrop(height: 640.h, imageUrl: currentMovie.image),
 
                 SingleChildScrollView(
                   child: SafeArea(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-
                         _HomeCarousel(
                           movies: movies,
                           initialIndex: currentIndex,
@@ -112,20 +107,20 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                           },
                         ),
 
-                        SizedBox(height: 24.h),
+                        SizedBox(height: 20.h),
 
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          child: _HomeSectionHeader(title: context.tr('action')),
+                          child: _HomeSectionHeader(
+                            title: context.tr('action'),
+                          ),
                         ),
 
                         SizedBox(height: 10.h),
 
-                        _HomeHorizontalMovieList(
-                          movies: movies,
-                        ),
+                        _HomeHorizontalMovieList(movies: movies),
 
-                        SizedBox(height: 20.h),
+                        SizedBox(height: 60.h),
                       ],
                     ),
                   ),
@@ -218,7 +213,8 @@ class _HomeCarousel extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<LanguageCubit, LanguageState>(
       builder: (context, langState) {
-        final isArabic = langState.isArabic ||
+        final isArabic =
+            langState.isArabic ||
             Localizations.maybeLocaleOf(context)?.languageCode == 'ar' ||
             context.loc.isArabic;
 
@@ -250,7 +246,10 @@ class _HomeCarousel extends StatelessWidget {
                       ),
                     ),
                   )
-                : Image.asset('assets/images/img_availableNow.png', width: 250.w),
+                : Image.asset(
+                    'assets/images/img_availableNow.png',
+                    width: 250.w,
+                  ),
             SizedBox(height: 10.h),
             CarouselSlider(
               options: CarouselOptions(
@@ -258,7 +257,7 @@ class _HomeCarousel extends StatelessWidget {
                 initialPage: initialIndex,
                 viewportFraction: 0.5,
                 enlargeCenterPage: true,
-                autoPlay: false,
+                autoPlay: true,
                 disableCenter: true,
                 animateToClosest: true,
                 onPageChanged: (index, reason) => onPageChanged(index),
@@ -336,9 +335,7 @@ class _HomeSectionHeader extends StatelessWidget {
 class _HomeHorizontalMovieList extends StatelessWidget {
   final List<MovieEntity> movies;
 
-  const _HomeHorizontalMovieList({
-    required this.movies,
-  });
+  const _HomeHorizontalMovieList({required this.movies});
 
   @override
   Widget build(BuildContext context) {
