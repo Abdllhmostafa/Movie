@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:movie_app/core/constants/app_assets.dart';
+import 'package:movie_app/core/localization/app_localizations.dart';
 import 'package:movie_app/core/routes/route_name.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 import 'package:movie_app/features/layout/presentation/profile/manager/profile_cubit.dart';
@@ -126,20 +127,20 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.r),
         ),
-        title: const Text(
-          "Delete Account",
-          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+        title: Text(
+          context.tr("delete_account"),
+          style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
         ),
-        content: const Text(
-          "Are you sure you want to delete your account? This action cannot be undone.",
-          style: TextStyle(color: AppColors.textGrey),
+        content: Text(
+          context.tr("delete_confirm_msg"),
+          style: const TextStyle(color: AppColors.textGrey),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text(
-              "Cancel",
-              style: TextStyle(color: AppColors.white),
+            child: Text(
+              context.tr("cancel"),
+              style: const TextStyle(color: AppColors.white),
             ),
           ),
           ElevatedButton(
@@ -148,9 +149,9 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
               Navigator.pop(dialogCtx);
               context.read<ProfileCubit>().deleteAccount();
             },
-            child: const Text(
-              "Delete",
-              style: TextStyle(color: AppColors.white),
+            child: Text(
+              context.tr("delete"),
+              style: const TextStyle(color: AppColors.white),
             ),
           ),
         ],
@@ -179,15 +180,17 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
         } else if (state is ProfileUpdateSuccessState) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(context.tr('profile_updated_success')),
               backgroundColor: AppColors.success,
             ),
           );
           Navigator.pop(context, true);
         } else if (state is ProfilePasswordResetSentState) {
+          final prefix = context.tr('password_reset_sent_to');
+          final suffix = context.tr('check_inbox');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text("Password reset email sent to ${state.email}"),
+              content: Text("$prefix ${state.email}. $suffix"),
               backgroundColor: AppColors.success,
             ),
           );
@@ -200,7 +203,7 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
         } else if (state is ProfileErrorState) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.errorMessage),
+              content: Text(context.trError(state.errorMessage)),
               backgroundColor: AppColors.error,
             ),
           );
@@ -222,7 +225,7 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
               icon: const Icon(Icons.arrow_back, color: Colors.white),
             ),
             title: Text(
-              "Pick Avatar",
+              context.tr("pick_avatar"),
               style: TextStyle(
                 color: AppColors.gold,
                 fontSize: 16.sp,
@@ -264,7 +267,7 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
                               height: 150.h,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) =>
-                                  Image.asset(
+                                   Image.asset(
                                 AppAssets.gamer9,
                                 width: 150.w,
                                 height: 150.h,
@@ -294,13 +297,13 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
                 SizedBox(height: 36.h),
                 CustomTextField(
                   controller: _nameController,
-                  hintText: "Enter your name",
+                  hintText: context.tr("enter_your_name"),
                   icon: Icons.person,
                 ),
                 SizedBox(height: 20.h),
                 CustomTextField(
                   controller: _phoneController,
-                  hintText: "Enter your phone number",
+                  hintText: context.tr("enter_your_phone"),
                   icon: Icons.phone,
                   keyboardType: TextInputType.phone,
                 ),
@@ -314,7 +317,7 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
                               .read<ProfileCubit>()
                               .sendPasswordResetEmail(),
                     child: Text(
-                      "Reset Password",
+                      context.tr("reset_password"),
                       style: TextStyle(
                         color: AppColors.white,
                         fontSize: 20.sp,
@@ -328,7 +331,7 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
                   onPressed: isLoading
                       ? () {}
                       : () => _showDeleteAccountDialog(context),
-                  text: "Delete Account",
+                  text: context.tr("delete_account"),
                   backgroundColor: AppColors.btnBgColor,
                   textColor: AppColors.white,
                 ),
@@ -340,8 +343,8 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
                           final name = _nameController.text.trim();
                           if (name.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Name cannot be empty"),
+                              SnackBar(
+                                content: Text(context.tr("name_cannot_be_empty")),
                                 backgroundColor: AppColors.error,
                               ),
                             );
@@ -353,7 +356,7 @@ class _UpdateProfileScreenBodyState extends State<_UpdateProfileScreenBody> {
                             phone: _phoneController.text.trim(),
                           );
                         },
-                  text: isLoading ? "Updating..." : "Update Data",
+                  text: isLoading ? context.tr("updating") : context.tr("update_data"),
                   backgroundColor: AppColors.gold,
                   textColor: AppColors.background,
                 ),

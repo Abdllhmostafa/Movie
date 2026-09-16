@@ -14,6 +14,8 @@ class AppAssets {
 
   static const String entertainment = "assets/animations/Entertainment.json";
 
+  static const String forgotPasswordIllustration = "assets/images/forgot_password_illustration.png";
+
   static const String star = "assets/images/movies/star.png";
   static const String movie1 = "assets/images/movies/movie_1.png";
   static const String movie2 = "assets/images/movies/movie_2.png";

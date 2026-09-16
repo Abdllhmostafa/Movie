@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:movie_app/core/localization/app_localizations.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 import 'package:movie_app/features/auth/presentation/widgets/auth_button_widget.dart';
 
@@ -29,7 +30,7 @@ class MovieDetailsHeader extends StatelessWidget {
 
     return Column(
       children: [
-        // Top Action Bar
+
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -48,7 +49,7 @@ class MovieDetailsHeader extends StatelessWidget {
           ],
         ),
         SizedBox(height: 120.h),
-        // Play Button
+
         InkWell(
           onTap: onPlay,
           borderRadius: BorderRadius.circular(width * 0.12),
@@ -71,7 +72,7 @@ class MovieDetailsHeader extends StatelessWidget {
           ),
         ),
         SizedBox(height: 24.h),
-        // Title
+
         Text(
           title,
           textAlign: TextAlign.center,
@@ -82,7 +83,7 @@ class MovieDetailsHeader extends StatelessWidget {
           ),
         ),
         SizedBox(height: 8.h),
-        // Year
+
         Text(
           year,
           style: TextStyle(
@@ -92,11 +93,11 @@ class MovieDetailsHeader extends StatelessWidget {
           ),
         ),
         SizedBox(height: 16.h),
-        // Watch Button
+
         AuthButtonWidget(
           backgroundColor: AppColors.btnBgColor,
           textColor: AppColors.white,
-          text: 'Watch',
+          text: context.tr('watch'),
           onPressed: onWatch ?? () {},
         ),
       ],

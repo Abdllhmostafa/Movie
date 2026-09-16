@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:movie_app/core/theme/app_colors.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:movie_app/core/localization/app_localizations.dart';
 import 'package:movie_app/features/auth/presentation/widgets/custom_text_field.dart';
 
 class RegisterFormWidget extends StatelessWidget {
@@ -30,108 +31,108 @@ class RegisterFormWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           CustomTextField(
-            hint: 'Enter your full name',
+            hint: context.tr('name'),
             controller: nameController,
             textInputAction: TextInputAction.next,
-            prefixIcon: const Icon(
-              Icons.person_outline,
-              color: AppColors.gold,
-              size: 22,
+            prefixIcon: Icon(
+              Icons.badge_outlined,
+              color: Colors.white,
+              size: 24.sp,
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter your full name';
+                return context.tr('please_enter_name');
               }
               if (value.trim().length < 3) {
-                return 'Name must be at least 3 characters';
+                return context.tr('name_min_length');
               }
               return null;
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 18.h),
           CustomTextField(
-            hint: 'Enter your email address',
+            hint: context.tr('email'),
             controller: emailController,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
-            prefixIcon: const Icon(
-              Icons.email_outlined,
-              color: AppColors.gold,
-              size: 22,
+            prefixIcon: Icon(
+              Icons.email,
+              color: Colors.white,
+              size: 24.sp,
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter your email address';
+                return context.tr('please_enter_email');
               }
               final emailRegex = RegExp(
                 r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
               );
               if (!emailRegex.hasMatch(value.trim())) {
-                return 'Please enter a valid email address';
+                return context.tr('please_enter_valid_email');
               }
               return null;
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 18.h),
           CustomTextField(
-            hint: 'Create a password',
+            hint: context.tr('password'),
             controller: passwordController,
             isPassword: true,
             textInputAction: TextInputAction.next,
-            prefixIcon: const Icon(
-              Icons.lock_outline,
-              color: AppColors.gold,
-              size: 22,
+            prefixIcon: Icon(
+              Icons.lock,
+              color: Colors.white,
+              size: 24.sp,
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter a password';
+                return context.tr('please_enter_password');
               }
               if (value.length < 6) {
-                return 'Password must be at least 6 characters';
+                return context.tr('password_min_length');
               }
               return null;
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 18.h),
           CustomTextField(
-            hint: 'Confirm your password',
+            hint: context.tr('confirm_password'),
             controller: rePasswordController,
             isPassword: true,
             textInputAction: TextInputAction.next,
-            prefixIcon: const Icon(
-              Icons.lock_outline,
-              color: AppColors.gold,
-              size: 22,
+            prefixIcon: Icon(
+              Icons.lock,
+              color: Colors.white,
+              size: 24.sp,
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please confirm your password';
+                return context.tr('please_confirm_password');
               }
               if (value != passwordController.text) {
-                return 'Passwords do not match';
+                return context.tr('passwords_not_match');
               }
               return null;
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 18.h),
           CustomTextField(
-            hint: 'Enter your mobile number',
+            hint: context.tr('phone_number'),
             controller: phoneController,
             keyboardType: TextInputType.phone,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => onSubmitted?.call(),
-            prefixIcon: const Icon(
-              Icons.phone_outlined,
-              color: AppColors.gold,
-              size: 22,
+            prefixIcon: Icon(
+              Icons.phone,
+              color: Colors.white,
+              size: 24.sp,
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter your mobile number';
+                return context.tr('please_enter_phone');
               }
               if (value.trim().length < 10) {
-                return 'Enter a valid mobile number (min 10 digits)';
+                return context.tr('phone_min_length');
               }
               return null;
             },

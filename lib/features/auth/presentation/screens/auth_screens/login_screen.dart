@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:movie_app/core/localization/app_localizations.dart';
 import 'package:movie_app/core/routes/route_name.dart';
 import 'package:movie_app/core/theme/app_colors.dart';
 import 'package:movie_app/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:movie_app/features/auth/presentation/manager/auth_state.dart';
 import 'package:movie_app/features/auth/presentation/widgets/auth_button_widget.dart';
 import 'package:movie_app/features/auth/presentation/widgets/auth_prompt_row.dart';
+import 'package:movie_app/features/auth/presentation/widgets/google_logo_icon.dart';
+import 'package:movie_app/features/auth/presentation/widgets/language_switch_widget.dart';
 import 'package:movie_app/features/auth/presentation/widgets/login_form_widget.dart';
 import 'package:movie_app/features/auth/presentation/widgets/route_logo_widget.dart';
 
@@ -47,98 +50,8 @@ class _LoginScreenState extends State<LoginScreen> {
     context.read<AuthCubit>().signInWithGoogle();
   }
 
-  void _showForgotPasswordDialog(BuildContext context) {
-    final resetEmailController =
-        TextEditingController(text: _emailController.text.trim());
-    final resetFormKey = GlobalKey<FormState>();
-
-    showDialog(
-      context: context,
-      builder: (dialogCtx) => AlertDialog(
-        backgroundColor: AppColors.cardBackground,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-        title: Text(
-          'Reset Password',
-          style: TextStyle(
-              color: AppColors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18.sp),
-        ),
-        content: Form(
-          key: resetFormKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Enter your email and we will send you a password reset link.',
-                style: TextStyle(color: AppColors.textGrey, fontSize: 14.sp),
-              ),
-              SizedBox(height: 16.h),
-              TextFormField(
-                controller: resetEmailController,
-                keyboardType: TextInputType.emailAddress,
-                style: TextStyle(color: AppColors.white, fontSize: 15.sp),
-                cursorColor: AppColors.gold,
-                decoration: InputDecoration(
-                  hintText: 'Enter your email',
-                  hintStyle:
-                      TextStyle(color: AppColors.textGrey, fontSize: 14.sp),
-                  prefixIcon:
-                      const Icon(Icons.email_outlined, color: AppColors.gold),
-                  fillColor: AppColors.inputFill,
-                  filled: true,
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                      borderSide: BorderSide.none),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                      borderSide: const BorderSide(color: AppColors.gold)),
-                ),
-                validator: (val) {
-                  if (val == null || val.trim().isEmpty) {
-                    return 'Please enter your email';
-                  }
-                  final emailRegex =
-                      RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                  if (!emailRegex.hasMatch(val.trim())) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
-                },
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogCtx),
-            child:
-                const Text('Cancel', style: TextStyle(color: AppColors.textGrey)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.gold,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.r)),
-            ),
-            onPressed: () {
-              if (resetFormKey.currentState?.validate() ?? false) {
-                final email = resetEmailController.text.trim();
-                Navigator.pop(dialogCtx);
-                context.read<AuthCubit>().resetPassword(email);
-              }
-            },
-            child: Text('Send Link',
-                style: TextStyle(
-                    color: AppColors.background,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14.sp)),
-          ),
-        ],
-      ),
-    );
+  void _navigateToForgotPassword(BuildContext context) {
+    Navigator.of(context).pushNamed(RouteName.forgotPassword);
   }
 
   @override
@@ -152,28 +65,20 @@ class _LoginScreenState extends State<LoginScreen> {
           listenWhen: (previous, current) => previous != current,
           listener: (context, state) {
             if (state is AuthSuccess) {
+              final welcome = context.tr('welcome_back');
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    'Welcome back${state.user.name != null ? ", ${state.user.name}" : ""}!',
+                    '$welcome${state.user.name != null ? ", ${state.user.name}" : ""}!',
                   ),
                   backgroundColor: AppColors.success,
                 ),
               );
               Navigator.pushReplacementNamed(context, RouteName.layout);
-            } else if (state is AuthPasswordResetSent) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Password reset email sent to ${state.email}. Check your inbox!',
-                  ),
-                  backgroundColor: AppColors.success,
-                ),
-              );
             } else if (state is AuthFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.errorMessage),
+                  content: Text(context.trError(state.errorMessage)),
                   backgroundColor: AppColors.error,
                 ),
               );
@@ -188,73 +93,76 @@ class _LoginScreenState extends State<LoginScreen> {
                   physics: const ClampingScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     horizontal: 20.w,
-                    vertical: 24.h,
+                    vertical: 20.h,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       SizedBox(height: 10.h),
-                      const RouteLogoWidget(),
-                      SizedBox(height: 36.h),
+                      const RouteLogoWidget(
+                        iconSize: 64,
+                      ),
+                      SizedBox(height: 32.h),
                       LoginFormWidget(
                         formKey: _formKey,
                         emailController: _emailController,
                         passwordController: _passwordController,
                         onSubmitted: () => _onLoginPressed(context),
                         onForgotPassword: () =>
-                            _showForgotPasswordDialog(context),
+                            _navigateToForgotPassword(context),
                       ),
-                      SizedBox(height: 30.h),
+                      SizedBox(height: 24.h),
                       AuthButtonWidget(
-                        text: 'Sign In',
+                        text: context.tr('login'),
+                        fontSize: 20.sp,
                         isLoading: isLoading,
                         onPressed: () => _onLoginPressed(context),
                       ),
-                      SizedBox(height: 24.h),
+                      SizedBox(height: 18.h),
                       AuthPromptRow(
-                        questionText: "Don't have an account?",
-                        actionText: "Create Account",
+                        questionText: context.tr('dont_have_account'),
+                        actionText: context.tr('create_one'),
                         onTap: () => _navigateToRegister(context),
                       ),
-                      SizedBox(height: 28.h),
+                      SizedBox(height: 22.h),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Expanded(
-                            child: Divider(
-                              indent: 30.w,
-                              color: AppColors.gold,
-                              thickness: 1.5,
-                            ),
+                          Container(
+                            width: 92.w,
+                            height: 1.2,
+                            color: AppColors.gold,
                           ),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 14.w),
                             child: Text(
-                              'OR',
+                              context.tr('or'),
                               style: TextStyle(
                                 color: AppColors.gold,
-                                fontSize: 18.sp,
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
-                                letterSpacing: 1.5,
+                                letterSpacing: 1.2,
                               ),
                             ),
                           ),
-                          Expanded(
-                            child: Divider(
-                              endIndent: 30.w,
-                              color: AppColors.gold,
-                              thickness: 1.5,
-                            ),
+                          Container(
+                            width: 92.w,
+                            height: 1.2,
+                            color: AppColors.gold,
                           ),
                         ],
                       ),
-                      SizedBox(height: 28.h),
+                      SizedBox(height: 24.h),
                       AuthButtonWidget(
-                        icon: Icons.g_mobiledata,
-                        iconSize: 34,
-                        text: 'Login with Google',
+                        customIcon: const GoogleLogoIcon(size: 24),
+                        text: context.tr('login_with_google'),
+                        fontSize: 18.sp,
                         isLoading: false,
                         onPressed: () => _onGoogleSignIn(context),
                       ),
+                      SizedBox(height: 32.h),
+                      const LanguageSwitchWidget(),
+                      SizedBox(height: 12.h),
                     ],
                   ),
                 ),

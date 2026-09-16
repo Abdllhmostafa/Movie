@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movie_app/core/routes/route_name.dart';
+import 'package:movie_app/features/auth/presentation/screens/auth_screens/forgot_password_screen.dart';
 import 'package:movie_app/features/auth/presentation/screens/auth_screens/login_screen.dart';
 import 'package:movie_app/features/auth/presentation/screens/auth_screens/register_screen.dart';
 import 'package:movie_app/features/layout/presentation/layout_screens/movie_details.dart';
@@ -20,6 +21,8 @@ class AppRouters {
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case RouteName.register:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
+      case RouteName.forgotPassword:
+        return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
       case RouteName.layout:
         return MaterialPageRoute(builder: (_) => const LayoutScreen());
       case RouteName.profile:
