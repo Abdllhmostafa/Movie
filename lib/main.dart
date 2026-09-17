@@ -84,7 +84,7 @@ class MyApp extends StatelessWidget {
                   GlobalWidgetsLocalizations.delegate,
                   GlobalCupertinoLocalizations.delegate,
                 ],
-                initialRoute: loggedIn ? RouteName.layout : RouteName.login,
+                initialRoute: RouteName.splash,
                 onGenerateRoute: appRouters.generateRoute,
                 debugShowCheckedModeBanner: false,
                 title: 'Route Movie App',
